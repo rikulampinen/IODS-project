@@ -1,5 +1,6 @@
 ---
 title: "IODS course project"
+author: "Richard Lamprecht"
 output:
   html_document:
     theme: cosmo
@@ -21,4 +22,9 @@ output:
 ```
 
 ***
+
+
+
+
+
 
