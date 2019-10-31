@@ -3,24 +3,29 @@
 
 ### The course:
 
-The course *"Introduction to open data science"* started on Wednesday 30^th^ October 2019. 
+The course *Introduction to open data science* started on Wednesday 30^th^ October 2019. 
 
 
 ### My feelings:
   
 **I'm feeling so excited!!**
-  
+
+I got aware of the course by an announcement some weeks ago on the University of Eastern Finland's
+yammer platform.
 After hecking the course material on MOOC platform I see great new things coming up for me to learn. 
 So I'm very excited about it.  
 I'm looking forward to meet all the new things I will learn in this course and especially I'm looking forward to meet all challenges coming up in this course.  
-I hope I can manage them.
+I hope I can manage all assignments.  
   
 
-### Links to my new GitHub pages
+**I'm expecting to learn a lot about data handling, improve my R skills and hopefully be able to use this knowledge later on in my work.**  
 
-[Richard's GitHub repository](https://github.com/rikulampinen/IODS-project)
 
-[Richard's GitHub diary](https://rikulampinen.github.io/IODS-project)
+### Links to my new GitHub pages:
+
+[Richard's GitHub IODS repository](https://github.com/rikulampinen/IODS-project)
+
+[Richard's GitHub IODS course diary](https://rikulampinen.github.io/IODS-project)
 
 
 
