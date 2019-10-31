@@ -1,17 +1,25 @@
 
 # About the project
 
-*Write a short description about the course and add a link to your GitHub repository here. This is an R Markdown (.Rmd) file so you can use R Markdown syntax.*
+### The course:
 
-**I'm feeling soo excited!**
+The course *"Introduction to open data science"* started on Wednesday 30^th^ October 2019. 
 
 
+### My feelings:
 
-Link to my GitHub repository:
-https://github.com/rikulampinen/IODS-project
+**I'm feeling so excited!!**
 
-Also here the link to my GitHub diary:
-https://rikulampinen.github.io/IODS-project
+After hecking the course material on MOOC platform I see great new things coming up for me to learn. 
+So I'm very excited about it.
+I'm looking forward to meet all the new things I will learn in this course and especially I'm looking forward to meet all challenges coming up in this course. I hope I can manage them.
+
+
+### Links to my new GitHub pages
+
+[Richard's GitHub repository](https://github.com/rikulampinen/IODS-project)
+
+[Richard's GitHub diary](https://rikulampinen.github.io/IODS-project)
 
 
 
