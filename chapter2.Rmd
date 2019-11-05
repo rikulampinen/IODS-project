@@ -3,8 +3,12 @@
 *Work of week 45 (4.11. - 10.11.2019)*
 
 - I started to work through the DataCamp exercises offered by the IODS course and was able to finish  
-  R Short and Sweet and the R Helsinki Open Data Science courses by Monday 4.11.2019.
-- 
+  - R Short and Sweet 
+  - R Helsinki Open Data Science courses  
+  by Monday 4.11.2019.    
+  
+
+- 5.11.2019: Start to work on R script for Data wrangling and regression analysis
 
 
 
