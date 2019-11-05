@@ -1,6 +1,14 @@
-# Insert chapter 2 title here
+# Chapter 2: Data wrangling and performinga regression analysis
 
-*Describe the work you have done this week and summarize your learning.*
+*Work of week 45 (4.11. - 10.11.2019)*
+
+- I started to work through the DataCamp exercises offered by the IODS course and was able to finish  
+  R Short and Sweet and the R Helsinki Open Data Science courses by Monday 4.11.2019.
+- 
+
+
+
+
 
 - Describe your work and results clearly. 
 - Assume the reader has an introductory course level understanding of writing and reading R code as well as statistical methods.
