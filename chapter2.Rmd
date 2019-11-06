@@ -1,33 +1,115 @@
 # Chapter 2: Data wrangling and performing a regression analysis
 
-*Work of week 45 (4.11. - 10.11.2019)*
+#### *Work of week 45 (4.11. - 10.11.2019)*
 
-#### 1. Data wrangling
+### 1. Data wrangling
 
 * **4.11.2019**: Started to work through the DataCamp exercises offered by the IODS course and was able to finish  
-    - R Short and Sweet   
-    - R Helsinki Open Data Science courses      
+  + R Short and Sweet   
+  + R Helsinki Open Data Science courses      
     
 
-* **5.11.2019**: Start to work on R script for Data wrangling and regression analysis  
-    - Wrote the script for data wrangling and was able to finish that part    
+* **5.11.2019**: Start to work on R script for data wrangling and regression analysis  
+  + Wrote the script for data wrangling and was able to finish that part    
       (all tests on the script worked)
-  
-#### 2. Analysis
+
+***   
+### 2. Analysis
 
 The work on the analysis script and documentation started on 6.11.2019  
 
-1. Read the dataset table from my data folder and checked the dataframe structure and dimensions 
+**1. Reading the data**  
+Read the dataset table from my data folder and checked the dataframe structure and dimensions 
 When I read the data table I set the "stringsAsFactor" agument (in the read.table function) to FALSE. So the observations in the gender column stay "F" and "M".  
 The dataframe includes 166 observations (the rows) in 7 variables (the columns).  
 
+**2. Graphical overview and data summary**  
     The data we analyise consists of a survey from students relating their learning approaches.
-The data includes the students' gender, age, exam points and the global attitude towards statistics (consisting of a sum of 10 questions related to students attitude towards statistics, each measured on the Likert scale (1-5). The attitude value was divided by 10 in the data wrangling part to show the value in the 1-5 scale.
-
-![Overview graph of the data](C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/OV_plot_lrn14.png)
+The data includes the students' gender, age, exam points and the global attitude towards statistics (consisting of a sum of 10 questions related to students attitude towards statistics, each measured on the Likert scale (1-5). The attitude value was divided by 10 in the data wrangling part to show the value in the 1-5 scale.  
+ 
+![Overview graph of the data](C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/OV_plot_lrn14.png)  
+  
+Data summary table of the lrn14_analysis dataset
+  
+     gender             age             attitude        points          deep           surf            stra      
+     Length:166         Min.   :17.00   Min.   :1.400   Min.   : 7.00   Min.   :1.58   Min.   :1.580   Min.   :1.250  
+     Class :character   1st Qu.:21.00   1st Qu.:2.600   1st Qu.:19.00   1st Qu.:3.33   1st Qu.:2.420   1st Qu.:2.620  
+     Mode  :character   Median :22.00   Median :3.200   Median :23.00   Median :3.67   Median :2.830   Median :3.185  
+                        Mean   :25.51   Mean   :3.143   Mean   :22.72   Mean   :3.68   Mean   :2.787   Mean   :3.121  
+                        3rd Qu.:27.00   3rd Qu.:3.700   3rd Qu.:27.75   3rd Qu.:4.08   3rd Qu.:3.170   3rd Qu.:3.620  
+                        Max.   :55.00   Max.   :5.000   Max.   :33.00   Max.   :4.92   Max.   :4.330   Max.   :5.000 
 
    
-   
+***
+### 3. Regression models  
+#### 3.1. Simple regression model of **point ~ attitude**
+    
+  Significant outcome was shown in the simple regression analysis of point ~ attitude  
+  Here is the code:  
+
+  att_lm <- lm(points ~ attitude, data = lrn14_analysis)  
+  summary(att_lm)  
+
+***    
+#### 3.1.1. Summary table
+
+    Call:
+    lm(formula = points ~ attitude, data = lrn14_analysis)
+
+    Residuals:
+         Min       1Q   Median       3Q      Max 
+    -16.9763  -3.2119   0.4339   4.1534  10.6645    
+
+    Coefficients:  
+                Estimate Std. Error t value Pr(>|t|)    
+    (Intercept)  11.6372     1.8303   6.358 1.95e-09 ***
+    attitude      3.5255     0.5674   6.214 4.12e-09 ***   
+
+    Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1  
+
+    Residual standard error: 5.32 on 164 degrees of freedom  
+    Multiple R-squared:  0.1906,	Adjusted R-squared:  0.1856    
+    F-statistic: 38.61 on 1 and 164 DF,  p-value: 4.119e-09  
+
+  
+***  
+#### 3.1.2. Diagnostic plots
+  
+![Diagnostic plots of model points ~ attitude](C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/att_lm.png)  
+
+
+***
+#### 3.1.3. Regression model interpretation  
+  
+
+
+
+***
+
+#### 3.2. Multiple regression model of **point ~ attitude + deep**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

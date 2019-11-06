@@ -1,0 +1,7 @@
+   gender	     age	   attitude	    points	     deep	     surf	     stra
+	Length:166        	Min.   :17.00  	Min.   :1.400  	Min.   : 7.00  	Min.   :1.58  	Min.   :1.580  	Min.   :1.250  
+	Class :character  	1st Qu.:21.00  	1st Qu.:2.600  	1st Qu.:19.00  	1st Qu.:3.33  	1st Qu.:2.420  	1st Qu.:2.620  
+	Mode  :character  	Median :22.00  	Median :3.200  	Median :23.00  	Median :3.67  	Median :2.830  	Median :3.185  
+	NA	Mean   :25.51  	Mean   :3.143  	Mean   :22.72  	Mean   :3.68  	Mean   :2.787  	Mean   :3.121  
+	NA	3rd Qu.:27.00  	3rd Qu.:3.700  	3rd Qu.:27.75  	3rd Qu.:4.08  	3rd Qu.:3.170  	3rd Qu.:3.620  
+	NA	Max.   :55.00  	Max.   :5.000  	Max.   :33.00  	Max.   :4.92  	Max.   :4.330  	Max.   :5.000  

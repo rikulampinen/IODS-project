@@ -34,9 +34,9 @@ lrn14_analysis <- select(learning2014, one_of(keep_columns))  # assin a new obje
 colnames(lrn14_analysis) <- c("gender", "age", "attitude", "points") # change of the kept column names
 
 # define questions (observations from variables) acc. instructions
-deep_q <- c("D03", "D11", "D19", "D27", "D07", "D14", "D22", "D30","D06",  "D15", "D23", "D31") 
-surf_q <- c("SU02","SU10","SU18","SU26", "SU05","SU13","SU21","SU29","SU08","SU16","SU24","SU32")
-stra_q <- c("ST01","ST09","ST17","ST25","ST04","ST12","ST20","ST28")
+deep_q <- c("D03", "D11", "D19", "D27", "D07", "D14", "D22", "D30","D06",  "D15", "D23", "D31")  # deep questions
+surf_q <- c("SU02","SU10","SU18","SU26", "SU05","SU13","SU21","SU29","SU08","SU16","SU24","SU32") # surface questions
+stra_q <- c("ST01","ST09","ST17","ST25","ST04","ST12","ST20","ST28") # strategic questions
 
 # Select the combined variables (columns) & scale the observations (mean) and add it to the analysis dataframe
 deep <- select(learning2014, one_of(deep_q))
@@ -100,7 +100,7 @@ str(lrn14_analysis)
 dim(lrn14_analysis)
 
 
-# Show a graphical overview of the data and show summaries
+# Graphical overview of the data and show summaries ----
 
 ov_lrn14 <- pairs(lrn14_analysis[-1])
 
@@ -117,19 +117,63 @@ ggsave("OV_plot_lrn14.png",
        plot = ov_lrn14_2, path = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/", scale = 1,
        dpi = 300)
 
-# summaries of the lrn14_analysis data
+# Summary table of the lrn14_analysis data ----
+
+Sum_table <- summary(lrn14_analysis)
+Sum_table
+
+getwd()
+
+# Save the table
+
+library(tidyr)
+library(broom)
+
+write.table(Sum_table, file = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/Sum_table.txt", 
+            sep = "\t", quote = FALSE, row.names = TRUE)
+
+
+# Regression models ----
+# Three variables compared with exam points as dependent variabe
+
+# Simple regressions ----
+# gender
+
+gen_lm <- lm(points ~ gender, data = lrn14_analysis)
+summary(gen_lm) # not significant
+
+# age
+age_lm <- lm(points ~ age, data = lrn14_analysis)
+summary(age_lm) # not significant
+
+# attitude
+att_lm <- lm(points ~ attitude, data = lrn14_analysis)
+summary(att_lm)
+
+windows()
+par(mfrow = c(2,2))
+plot(att_lm, which = c(1,2,5))
+savePlot(filename = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/att_lm.png",
+         type = "png", device = dev.cur())
+?restoreConsole
+
+savePlot("att_lm.png", plot =last_plot(), 
+       path = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/", scale = 1,
+       dpi = 300)
 
 
 
+# Multiple regressions ----
+# points ~ attitde + deep
 
+att_deep_lm <- lm(points ~ attitude + deep, data = lrn14_analysis)
+summary(att_deep_lm)
 
-
-
-
-
-
-
-
+windows()
+par(mfrow = c(2,1))
+plot(att_deep_lm, which = c(1,2,5))
+savePlot(filename = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/att_deep_lm.png",
+         type = "png", device = dev.cur())
 
 
 
