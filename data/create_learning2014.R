@@ -1,4 +1,4 @@
-# Script: "create_learning2014 ----
+# Script: "create_learning2014" ----
 
 # Name: Richard E. Lamprecht
 # Date: 5.11.2019
@@ -20,6 +20,10 @@ learning2014 <- read.table(file =
 View(learning2014) # see the whole dataset in a new window
 str(learning2014) # check the structure of the dataset --> --> (observations = rows and variables = columns)
 dim(learning2014) # check the table dimensions --> (observations = rows and variables = columns)
+
+# Structure of the data
+
+
 
 
 # Create an analysis dataset: "lrn14_analysis" ----
@@ -189,7 +193,13 @@ savePlot(filename = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS
 
 
 
+## attitude vs. points
+## what is the summary points ~ attitude telling me
 
+# increase of attitude by 1, the points increase by 3.5
+
+
+# diagnostic plots
 
 
 

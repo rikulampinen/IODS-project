@@ -84,6 +84,7 @@ Data summary table of the lrn14_analysis dataset
 
 
 
+
 ***
 
 #### 2.3.2. Multiple regression model of **point ~ attitude + deep + surf + stra**
@@ -116,6 +117,9 @@ summary(att_de_su_st_lm)
     Residual standard error: 5.286 on 161 degrees of freedom  
     Multiple R-squared:  0.2155,	Adjusted R-squared:  0.196   
     F-statistic: 11.06 on 4 and 161 DF,  p-value: 6.014e-08  
+
+
+
 
 
 
