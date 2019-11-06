@@ -164,15 +164,15 @@ savePlot("att_lm.png", plot =last_plot(),
 
 
 # Multiple regressions ----
-# points ~ attitde + deep
+# points ~ attitude + deep + surf + stra
 
-att_deep_lm <- lm(points ~ attitude + deep, data = lrn14_analysis)
-summary(att_deep_lm)
+att_de_su_st_lm <- lm(points ~ attitude + deep + surf + stra, data = lrn14_analysis)
+summary(att_de_su_st_lm)
 
 windows()
-par(mfrow = c(2,1))
-plot(att_deep_lm, which = c(1,2,5))
-savePlot(filename = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/att_deep_lm.png",
+par(mfrow = c(2,2))
+plot(att_de_su_st_lm, which = c(1,2,5))
+savePlot(filename = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/att_de_su_st_lm.png",
          type = "png", device = dev.cur())
 
 
