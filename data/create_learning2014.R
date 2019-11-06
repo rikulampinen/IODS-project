@@ -48,6 +48,9 @@ lrn14_analysis$surf <- round(rowMeans(surf), digits = 2)
 stra <- select(learning2014, one_of(stra_q))
 lrn14_analysis$stra <- round(rowMeans(stra), digits = 2)
 
+# devide the number of the attitude column by 10 (its a sum of 10 questions)
+lrn14_analysis$attitude <- lrn14_analysis$attitude / 10
+
 # Exclude observations where the exam points variable is zero. 
 lrn14_analysis <- filter(lrn14_analysis, points > 0)
 
@@ -87,6 +90,65 @@ read.csv(file =
 
 
 # DATA ANALYSIS ----
+
+# Read the dataset & assign it to object lrn14_analysis ----
+
+lrn14_analysis <- read.table(file = 
+                  "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/lrn14_analysis_table.txt", stringsAsFactors = FALSE)
+
+str(lrn14_analysis)
+dim(lrn14_analysis)
+
+
+# Show a graphical overview of the data and show summaries
+
+ov_lrn14 <- pairs(lrn14_analysis[-1])
+
+# more advanced overview plot
+library(ggplot2)
+library(GGally)
+
+ov_lrn14_2 <- ggpairs(lrn14_analysis, mapping = aes(), lower = list(combo = wrap("facethist", bins = 20)))
+
+ov_lrn14_2
+
+# Save the overview plot
+ggsave("OV_plot_lrn14.png", 
+       plot = ov_lrn14_2, path = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/", scale = 1,
+       dpi = 300)
+
+# summaries of the lrn14_analysis data
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

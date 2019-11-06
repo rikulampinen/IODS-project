@@ -1,15 +1,33 @@
-# Chapter 2: Data wrangling and performinga regression analysis
+# Chapter 2: Data wrangling and performing a regression analysis
 
 *Work of week 45 (4.11. - 10.11.2019)*
 
-- I started to work through the DataCamp exercises offered by the IODS course and was able to finish  
-  - R Short and Sweet 
-  - R Helsinki Open Data Science courses  
-  by Monday 4.11.2019.    
+#### 1. Data wrangling
+
+* **4.11.2019**: Started to work through the DataCamp exercises offered by the IODS course and was able to finish  
+    - R Short and Sweet   
+    - R Helsinki Open Data Science courses      
+    
+
+* **5.11.2019**: Start to work on R script for Data wrangling and regression analysis  
+    - Wrote the script for data wrangling and was able to finish that part    
+      (all tests on the script worked)
   
+#### 2. Analysis
 
-- 5.11.2019: Start to work on R script for Data wrangling and regression analysis
+The work on the analysis script and documentation started on 6.11.2019  
 
+1. Read the dataset table from my data folder and checked the dataframe structure and dimensions 
+When I read the data table I set the "stringsAsFactor" agument (in the read.table function) to FALSE. So the observations in the gender column stay "F" and "M".  
+The dataframe includes 166 observations (the rows) in 7 variables (the columns).  
+
+    The data we analyise consists of a survey from students relating their learning approaches.
+The data includes the students' gender, age, exam points and the global attitude towards statistics (consisting of a sum of 10 questions related to students attitude towards statistics, each measured on the Likert scale (1-5). The attitude value was divided by 10 in the data wrangling part to show the value in the 1-5 scale.
+
+![Overview graph of the data](C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/OV_plot_lrn14.png)
+
+   
+   
 
 
 
