@@ -27,11 +27,20 @@ dim(learning2014) # check the table dimensions --> (observations = rows and vari
 # Create an analysis dataset with the variables gender, age, attitude, deep, stra, surf and points 
 # (by combining questions in the learning2014 data)
 
-library(dplyr) # call the package for data wrangling
+library(dplyr) # load the package for data wrangling
 
 keep_columns <- c("gender","Age","Attitude","Points") # these are the data columns which need to be kept
 lrn14_analysis <- select(learning2014, one_of(keep_columns))  # assin a new object and select kept columns
 colnames(lrn14_analysis) <- c("gender", "age", "attitude", "points") # change of the kept column names
+
+## use %>% more often!!
+
+# e.g.
+lrn14_analysis <- lrn14_analysis %>% rename(Age = age, Points = points) # pipe is a good way for data handling!!
+
+
+
+
 
 # define questions (observations from variables) acc. instructions
 deep_q <- c("D03", "D11", "D19", "D27", "D07", "D14", "D22", "D30","D06",  "D15", "D23", "D31")  # deep questions
@@ -108,7 +117,7 @@ ov_lrn14 <- pairs(lrn14_analysis[-1])
 library(ggplot2)
 library(GGally)
 
-ov_lrn14_2 <- ggpairs(lrn14_analysis, mapping = aes(), lower = list(combo = wrap("facethist", bins = 20)))
+ov_lrn14_2 <- ggpairs(lrn14_analysis, mapping = aes(col = gender), lower = list(combo = wrap("facethist", bins = 20)))
 
 ov_lrn14_2
 

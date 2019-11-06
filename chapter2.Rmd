@@ -2,7 +2,7 @@
 
 #### *Work of week 45 (4.11. - 10.11.2019)*
 
-### 1. Data wrangling
+## 1. Data wrangling
 
 * **4.11.2019**: Started to work through the DataCamp exercises offered by the IODS course and was able to finish  
   + R Short and Sweet   
@@ -14,17 +14,17 @@
       (all tests on the script worked)
 
 ***   
-### 2. Analysis
+## 2. Analysis
 
 The work on the analysis script and documentation started on 6.11.2019  
 
-**1. Reading the data**  
-Read the dataset table from my data folder and checked the dataframe structure and dimensions 
-When I read the data table I set the "stringsAsFactor" agument (in the read.table function) to FALSE. So the observations in the gender column stay "F" and "M".  
-The dataframe includes 166 observations (the rows) in 7 variables (the columns).  
+### 2.1. Reading the data    
+Read the dataset table from my data folder and checked the dataframe structure and dimensions.  
+When I read the data table I set the "stringsAsFactor" agument (in the read.table function) to FALSE. So the observations in the gender column stay "F" and "M".   
+The dataframe includes 166 observations (the rows) in 7 variables (the columns).    
 
-**2. Graphical overview and data summary**  
-    The data we analyise consists of a survey from students relating their learning approaches.
+### 2.2. Graphical overview and data summary     
+The data we analyise consists of a survey from students relating their learning approaches.
 The data includes the students' gender, age, exam points and the global attitude towards statistics (consisting of a sum of 10 questions related to students attitude towards statistics, each measured on the Likert scale (1-5). The attitude value was divided by 10 in the data wrangling part to show the value in the 1-5 scale.  
  
 ![Overview graph of the data](C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/OV_plot_lrn14.png)  
@@ -41,8 +41,8 @@ Data summary table of the lrn14_analysis dataset
 
    
 ***
-### 3. Regression models  
-#### 3.1. Simple regression model of **point ~ attitude**
+### 2.3. Regression models  
+#### 2.3.1. Simple regression model of **point ~ attitude**
     
   Significant outcome was shown in the simple regression analysis of point ~ attitude  
   Here is the code:  
@@ -51,7 +51,7 @@ Data summary table of the lrn14_analysis dataset
   summary(att_lm)  
 
 ***    
-#### 3.1.1. Summary table
+##### 2.3.1.1. Summary table
 
     Call:
     lm(formula = points ~ attitude, data = lrn14_analysis)
@@ -73,20 +73,20 @@ Data summary table of the lrn14_analysis dataset
 
   
 ***  
-#### 3.1.2. Diagnostic plots
+##### 2.3.1.2. Diagnostic plots
   
 ![Diagnostic plots of model points ~ attitude](C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/att_lm.png)  
 
 
 ***
-#### 3.1.3. Regression model interpretation  
+##### 2.3.1.3. Regression model interpretation  
   
 
 
 
 ***
 
-#### 3.2. Multiple regression model of **point ~ attitude + deep + surf + stra**
+#### 2.3.2. Multiple regression model of **point ~ attitude + deep + surf + stra**
 
 Here the code for this regression model:  
 
@@ -94,7 +94,7 @@ att_de_su_st_lm <- lm(points ~ attitude + deep + surf + stra, data = lrn14_analy
 summary(att_de_su_st_lm)
 
 
-#### 3.2.1. Summary table
+##### 2.3.2.1. Summary table
 
     Call:  
     lm(formula = points ~ attitude + deep + surf + stra, data = lrn14_analysis)  
@@ -133,12 +133,14 @@ summary(att_de_su_st_lm)
 
 
 
-#### 3.2.2. Diagnostic plots
+##### 2.3.2.2. Diagnostic plots
 
 ![Diagnostic plots of model points ~ attitude + deep + surf + stra](C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/att_de_su_st_lm.png)  
 
 
-
+***
+##### 2.3.2.3. Regression model interpretation  
+  
 
 
 
