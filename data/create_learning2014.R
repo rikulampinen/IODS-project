@@ -21,9 +21,11 @@ View(learning2014) # see the whole dataset in a new window
 str(learning2014) # check the structure of the dataset --> --> (observations = rows and variables = columns)
 dim(learning2014) # check the table dimensions --> (observations = rows and variables = columns)
 
-# Structure of the data
+# Structure of the data - short explanation
 
-
+library(ggplot2)
+qplot(Attitude, Points, data = learning2014)
+hist(learning2014$Points)
 
 
 # Create an analysis dataset: "lrn14_analysis" ----
@@ -53,19 +55,26 @@ stra_q <- c("ST01","ST09","ST17","ST25","ST04","ST12","ST20","ST28") # strategic
 
 # Select the combined variables (columns) & scale the observations (mean) and add it to the analysis dataframe
 deep <- select(learning2014, one_of(deep_q))
-lrn14_analysis$deep <- round(rowMeans(deep), digits = 2)
+lrn14_analysis$deep <- round(rowMeans(deep, na.rm = TRUE), digits = 2)
 
 surf <- select(learning2014, one_of(surf_q))
-lrn14_analysis$surf <- round(rowMeans(surf), digits = 2)
+lrn14_analysis$surf <- round(rowMeans(surf,na.rm = TRUE), digits = 2)
 
 stra <- select(learning2014, one_of(stra_q))
-lrn14_analysis$stra <- round(rowMeans(stra), digits = 2)
+lrn14_analysis$stra <- round(rowMeans(stra, na.rm = TRUE), digits = 2)
 
 # devide the number of the attitude column by 10 (its a sum of 10 questions)
 lrn14_analysis$attitude <- lrn14_analysis$attitude / 10
 
 # Exclude observations where the exam points variable is zero. 
 lrn14_analysis <- filter(lrn14_analysis, points > 0)
+
+
+# write a pipe coding of the data wrangling!!!
+
+
+
+
 
 # Check the analysis dataset
 str(lrn14_analysis)
@@ -92,6 +101,13 @@ write.csv(lrn14_analysis,
           file = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/lrn14_analysis_table.csv", 
           row.names = FALSE)
 
+
+# to save an excel file
+library(openxlsx)
+# saved as:
+# write.xlsx(object, file = )
+
+
 # check if the table can be read ----
 
 read.table(file = 
@@ -107,10 +123,15 @@ read.csv(file =
 # Read the dataset & assign it to object lrn14_analysis ----
 
 lrn14_analysis <- read.table(file = 
-                  "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/lrn14_analysis_table.txt", stringsAsFactors = FALSE)
+                  "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/lrn14_analysis_table.txt", 
+                  stringsAsFactors = FALSE) # check if you need strings as factors or if you want to keep the string - here F/M
 
 str(lrn14_analysis)
 dim(lrn14_analysis)
+
+qplot(attitude, points, data = lrn14_analysis) + geom_smooth(method = lm)
+hist(lrn14_analysis$points)
+
 
 
 # Graphical overview of the data and show summaries ----

@@ -2,17 +2,96 @@
 
 #### *Work of week 45 (4.11. - 10.11.2019)*
 
+***
 ## 1. Data wrangling
 
-* **4.11.2019**: Started to work through the DataCamp exercises offered by the IODS course and was able to finish  
-  + R Short and Sweet   
-  + R Helsinki Open Data Science courses      
+**4.11.2019**: Started to work through the DataCamp exercises offered by the IODS course and was able to finish  
+
+* R Short and Sweet   
+* R Helsinki Open Data Science courses      
     
 
-* **5.11.2019**: Start to work on R script for data wrangling and regression analysis  
-  + Wrote the script for data wrangling and was able to finish that part    
-      (all tests on the script worked)
+**5.11.2019**: Start to work on R script for data wrangling and regression analysis  
 
+* Wrote the script for data wrangling and was able to finish that part (all tests on the script worked)
+  
+##### **Script of the data read and data wrangling**
+  
+```{r, readindata, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+# Read the data file ----
+learning2014 <- read.table(file = 
+                "https://www.mv.helsinki.fi/home/kvehkala/JYTmooc/JYTOPKYS3-data.txt", 
+                sep = "\t", header = TRUE)                          
+                # read the data file and assign it to the object "learning2014"
+
+# Explore the read data ----
+
+View(learning2014) # see the whole dataset in a new window
+str(learning2014) # check the structure of the dataset --> --> (observations = rows and variables = columns)
+dim(learning2014) # check the table dimensions --> (observations = rows and variables = columns)
+```
+  
+The dataset consists of 183 observations (rows) in 60 variables (columns). 
+  
+If you want to check the data also with some diagrams, you can use for example following plots:  
+
+```{r, dataplots, results='hide', fig.show ='hide'} 
+# Structure of some the data in plot or in a histogram (here the variable Points from)
+library(ggplot2)
+qplot(Attitude, Points, data = learning2014)
+hist(learning2014$Points)
+```
+  
+  
+What follows now is the data wrangling. We have to summarize variables of deep, surface and strategic learning approaches and calclulate the mean value of the summarized variables. Other variables stay (gender, Attitude, Points), only the column names are changed.
+  
+##### **Script for data wrangling**
+
+I decided to do the data wrangling into a new R object (a dataframe) which I named "lrn14_analysis". This dataframe will later be used for the data analyses.  
+Here I used a more complicated way to do the data wrangling, in the meeting on Wednesday, 6.11. a way with the pipe operator %>% was presented.  
+  
+```{r, wrangledata, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+# Create an analysis dataset: "lrn14_analysis" ----
+
+# Create an analysis dataset with the variables gender, age, attitude, deep, stra, surf and points 
+# (by combining questions in the learning2014 data)
+
+library(dplyr) # load the package for data wrangling
+
+keep_columns <- c("gender","Age","Attitude","Points") # these are the data columns which need to be kept
+lrn14_analysis <- select(learning2014, one_of(keep_columns))  # assin a new object and select kept columns
+colnames(lrn14_analysis) <- c("gender", "age", "attitude", "points") # change of the kept column names
+
+# define questions (observations from variables) acc. instructions
+deep_q <- c("D03", "D11", "D19", "D27", "D07", "D14", "D22", "D30","D06",  "D15", "D23", "D31")  # deep questions
+surf_q <- c("SU02","SU10","SU18","SU26", "SU05","SU13","SU21","SU29","SU08","SU16","SU24","SU32") # surface questions
+stra_q <- c("ST01","ST09","ST17","ST25","ST04","ST12","ST20","ST28") # strategic questions
+
+# Select the combined variables (columns) & scale the observations (mean) and add it to the analysis dataframe
+deep <- select(learning2014, one_of(deep_q))
+lrn14_analysis$deep <- round(rowMeans(deep, na.rm = TRUE), digits = 2) # values are rounded to 2 digits
+
+surf <- select(learning2014, one_of(surf_q))
+lrn14_analysis$surf <- round(rowMeans(surf,na.rm = TRUE), digits = 2)
+
+stra <- select(learning2014, one_of(stra_q))
+lrn14_analysis$stra <- round(rowMeans(stra, na.rm = TRUE), digits = 2)
+
+# devide the number of the attitude column by 10 (its a sum of 10 questions)
+lrn14_analysis$attitude <- lrn14_analysis$attitude / 10
+
+# Exclude observations where the exam points variable is zero. 
+lrn14_analysis <- filter(lrn14_analysis, points > 0)
+
+# Check the analysis dataset
+str(lrn14_analysis)
+dim(lrn14_analysis)
+```
+  
+The data consists now of 7 variables (columns) and 160 observations. The object name is "lrn14_analysis".  
+Now follows the data analysis.  
+  
+  
 ***   
 ## 2. Analysis
 
@@ -20,8 +99,31 @@ The work on the analysis script and documentation started on 6.11.2019
 
 ### 2.1. Reading the data    
 Read the dataset table from my data folder and checked the dataframe structure and dimensions.  
+
+```{r readdata,echo=TRUE,results='hide',message=FALSE,warning=FALSE}
+
+# Read the data file ----
+setwd("C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project") # set work directory
+library(dplyr)
+lrn14_analysis <- 
+read.table(file = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/lrn14_analysis_table.txt", stringsAsFactors = TRUE) # read the data table
+
+
+
+
+
+
+
+
+```
+
+
 When I read the data table I set the "stringsAsFactor" agument (in the read.table function) to FALSE. So the observations in the gender column stay "F" and "M".   
-The dataframe includes 166 observations (the rows) in 7 variables (the columns).    
+The dataframe includes 166 observations (the rows) in 7 variables (the columns).   
+
+
+
+
 
 ### 2.2. Graphical overview and data summary     
 The data we analyise consists of a survey from students relating their learning approaches.
@@ -45,10 +147,9 @@ Data summary table of the lrn14_analysis dataset
 #### 2.3.1. Simple regression model of **point ~ attitude**
     
   Significant outcome was shown in the simple regression analysis of point ~ attitude  
-  Here is the code:  
+  Here is the code: 
 
-  att_lm <- lm(points ~ attitude, data = lrn14_analysis)  
-  summary(att_lm)  
+
 
 ***    
 ##### 2.3.1.1. Summary table
