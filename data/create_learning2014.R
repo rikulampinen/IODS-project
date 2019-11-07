@@ -21,8 +21,7 @@ View(learning2014) # see the whole dataset in a new window
 str(learning2014) # check the structure of the dataset --> --> (observations = rows and variables = columns)
 dim(learning2014) # check the table dimensions --> (observations = rows and variables = columns)
 
-# Structure of the data - short explanation
-
+# Structure of some the data in plot or in a histogram (here the variable Points from)
 library(ggplot2)
 qplot(Attitude, Points, data = learning2014)
 hist(learning2014$Points)
@@ -55,7 +54,7 @@ stra_q <- c("ST01","ST09","ST17","ST25","ST04","ST12","ST20","ST28") # strategic
 
 # Select the combined variables (columns) & scale the observations (mean) and add it to the analysis dataframe
 deep <- select(learning2014, one_of(deep_q))
-lrn14_analysis$deep <- round(rowMeans(deep, na.rm = TRUE), digits = 2)
+lrn14_analysis$deep <- round(rowMeans(deep, na.rm = TRUE), digits = 2) # values are rounded to 2 digits
 
 surf <- select(learning2014, one_of(surf_q))
 lrn14_analysis$surf <- round(rowMeans(surf,na.rm = TRUE), digits = 2)
@@ -73,9 +72,6 @@ lrn14_analysis <- filter(lrn14_analysis, points > 0)
 # write a pipe coding of the data wrangling!!!
 
 
-
-
-
 # Check the analysis dataset
 str(lrn14_analysis)
 dim(lrn14_analysis)
@@ -84,6 +80,8 @@ dim(lrn14_analysis)
 # Set the working directory to IODS project folder ---- 
 
 getwd() # check the current working directory
+
+
 
 setwd("C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project") # set the wd to the IODS folder
 
@@ -124,11 +122,12 @@ read.csv(file =
 
 lrn14_analysis <- read.table(file = 
                   "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/lrn14_analysis_table.txt", 
-                  stringsAsFactors = FALSE) # check if you need strings as factors or if you want to keep the string - here F/M
+                  stringsAsFactors = TRUE) # check if you need strings as factors or if you want to keep the string - here F/M
 
 str(lrn14_analysis)
 dim(lrn14_analysis)
 
+# Check qplot and histogram
 qplot(attitude, points, data = lrn14_analysis) + geom_smooth(method = lm)
 hist(lrn14_analysis$points)
 
@@ -142,7 +141,10 @@ ov_lrn14 <- pairs(lrn14_analysis[-1])
 library(ggplot2)
 library(GGally)
 
-ov_lrn14_2 <- ggpairs(lrn14_analysis, mapping = aes(col = gender), lower = list(combo = wrap("facethist", bins = 20)))
+?ggpairs
+
+ov_lrn14_2 <- ggpairs(lrn14_analysis, mapping = aes(col = gender, ), title = "Graphical overview of lrn14_analysis", 
+                      lower = list(combo = wrap("facethist", bins = 20))) 
 
 ov_lrn14_2
 
@@ -187,8 +189,12 @@ summary(att_lm)
 windows()
 par(mfrow = c(2,2))
 plot(att_lm, which = c(1,2,5))
+
+?ggplot
+
 savePlot(filename = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/att_lm.png",
          type = "png", device = dev.cur())
+
 ?restoreConsole
 
 savePlot("att_lm.png", plot =last_plot(), 
@@ -196,9 +202,39 @@ savePlot("att_lm.png", plot =last_plot(),
        dpi = 300)
 
 
-
 # Multiple regressions ----
-# points ~ attitude + deep + surf + stra
+
+# points ~ attitude + stra ----
+
+att_st_lm <- lm(points ~ attitude + stra, data = lrn14_analysis)
+summary(att_st_lm)
+
+windows()
+
+par(mfrow = c(2,2))
+plot(att_st_lm, which = c(1,2,5))
+
+
+
+savePlot(filename = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/att_st_lm.png",
+         type = "png", device = dev.cur())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# points ~ attitude + deep + surf + stra ----
 
 att_de_su_st_lm <- lm(points ~ attitude + deep + surf + stra, data = lrn14_analysis)
 summary(att_de_su_st_lm)
