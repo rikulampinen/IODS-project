@@ -3,11 +3,9 @@
 # Name: Richard E. Lamprecht
 # Date: 5.11.2019
 
-# Script for all exercises in the course: Introduction to Open Data Science (IODS) ----
+# CHAPTER 2: Regression and model validation --------------------------------------------------------------------------
 
-# Chapter 2: Regression and model validation ----
-
-# 1. DATA WRANGLING ----
+# 2.1. DATA WRANGLING ----
 
 # Read the data file ----
 
@@ -115,7 +113,7 @@ read.csv(file =
 
 
 
-# DATA ANALYSIS ----
+# 2.2 DATA ANALYSIS ----
 
 # Read the dataset & assign it to object lrn14_analysis ----
 
@@ -240,41 +238,4 @@ savePlot(filename = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS
 
 # increase of attitude by 1, the points increase by 3.5
 # diagnostic plots
-
-
-# Chapter 3: Logistic regression ----
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
