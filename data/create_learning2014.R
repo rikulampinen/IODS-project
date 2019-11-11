@@ -3,9 +3,11 @@
 # Name: Richard E. Lamprecht
 # Date: 5.11.2019
 
-# Script for exercise 2 in the course: Introduction to Open Data Science (IODS) ----
+# Script for all exercises in the course: Introduction to Open Data Science (IODS) ----
 
-# DATA WRANGLING ----
+# Chapter 2: Regression and model validation ----
+
+# 1. DATA WRANGLING ----
 
 # Read the data file ----
 
@@ -42,9 +44,6 @@ colnames(lrn14_analysis) <- c("gender", "age", "attitude", "points") # change of
 
 # e.g.
 lrn14_analysis <- lrn14_analysis %>% rename(Age = age, Points = points) # pipe is a good way for data handling!!
-
-
-
 
 
 # define questions (observations from variables) acc. instructions
@@ -240,9 +239,10 @@ savePlot(filename = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS
 ## what is the summary points ~ attitude telling me
 
 # increase of attitude by 1, the points increase by 3.5
-
-
 # diagnostic plots
+
+
+# Chapter 3: Logistic regression ----
 
 
 

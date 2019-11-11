@@ -167,7 +167,7 @@ For a graphical overview of the dataset I used the `ggpairs()` function which re
 library(ggplot2) 
 library(GGally) # to show the graph these packages need to be loaded
 
-ov_lrn14_2 <- ggpairs(lrn14_analysis, mapping = aes(col = gender, ), title = "Graphical overview of lrn14_analysis", 
+ov_lrn14_2 <- ggpairs(lrn14_analysis, mapping = aes(col = gender), title = "Graphical overview of lrn14_analysis", 
                       lower = list(combo = wrap("facethist", bins = 20)), 
                       upper = list(continuous = wrap("cor", size = 2.8)))
 

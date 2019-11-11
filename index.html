@@ -584,7 +584,7 @@ lrn14_analysis %&gt;% str() # read the data table and check the structure</code>
 <pre><code>library(ggplot2) 
 library(GGally) # to show the graph these packages need to be loaded
 
-ov_lrn14_2 &lt;- ggpairs(lrn14_analysis, mapping = aes(col = gender, ), title = &quot;Graphical overview of lrn14_analysis&quot;, 
+ov_lrn14_2 &lt;- ggpairs(lrn14_analysis, mapping = aes(col = gender), title = &quot;Graphical overview of lrn14_analysis&quot;, 
                       lower = list(combo = wrap(&quot;facethist&quot;, bins = 20)), 
                       upper = list(continuous = wrap(&quot;cor&quot;, size = 2.8)))
 
