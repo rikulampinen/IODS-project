@@ -201,6 +201,10 @@ savePlot("att_lm.png", plot =last_plot(),
        path = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/", scale = 1,
        dpi = 300)
 
+#
+qplot(attitude, points, data = lrn14_analysis) + geom_smooth(method = lm)
+
+
 
 # Multiple regressions ----
 
@@ -221,34 +225,16 @@ savePlot(filename = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS
 
 
 
+# points ~ deep + surf + stra ----
 
-
-
-
-
-
-
-
-
-
-
-
-
-# points ~ attitude + deep + surf + stra ----
-
-att_de_su_st_lm <- lm(points ~ attitude + deep + surf + stra, data = lrn14_analysis)
-summary(att_de_su_st_lm)
+de_su_st_lm <- lm(points ~ deep + surf + stra, data = lrn14_analysis)
+summary(de_su_st_lm)
 
 windows()
 par(mfrow = c(2,2))
-plot(att_de_su_st_lm, which = c(1,2,5))
-savePlot(filename = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/att_de_su_st_lm.png",
+plot(de_su_st_lm, which = c(1,2,5))
+savePlot(filename = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/de_su_st_lm.png",
          type = "png", device = dev.cur())
-
-
-
-
-
 
 ## attitude vs. points
 ## what is the summary points ~ attitude telling me

@@ -22,12 +22,8 @@ output:
 ```{r child = "chapter2.Rmd"}
 ```
 
-***
-```
-
 
 ***
-
 
 
 

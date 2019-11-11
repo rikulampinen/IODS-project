@@ -15,6 +15,8 @@
 
 * Wrote the script for data wrangling and was able to finish that part (all tests on the script worked)
   
+Now follows a discription through my work progress.
+ 
 ### 1.1. Read the dataframe  
 
 ##### **Script of the data read (reading the dataframe from the website)**
@@ -28,7 +30,7 @@ learning2014 <- read.table(file =
 
 # Explore the read data ----
 
-View(learning2014) # see the whole dataset in a new window
+head(learning2014) # see the top of the dataset with the first 6 observations
 str(learning2014) # check the structure of the dataset --> --> (observations = rows and variables = columns)
 dim(learning2014) # check the table dimensions --> (observations = rows and variables = columns)
 ```
@@ -96,7 +98,6 @@ dim(lrn14_analysis)
 ```
   
 The data consists now of 7 variables (columns) and 166 observations. The object name is "lrn14_analysis".  
-Now follows the data analysis.  
   
 ***
 ### 1.3. Safe the updated dataframe as a .txt table or .csv table  
@@ -159,8 +160,8 @@ The data we analyise consists of a survey from students relating their learning 
 The data includes the students' gender, age, exam points and the global attitude towards statistics (consisting of a sum of 10 questions related to students attitude towards statistics, each measured on the Likert scale (1-5). The attitude value was divided by 10 in the data wrangling part to show the value in the 1-5 scale. 
 
 For a graphical overview of the dataset I used the `ggpairs()` function which results in several plots and correlations of the observations between the different variables.   
-
-```{r, ovgraph, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+  
+```
 library(ggplot2) 
 library(GGally) # to show the graph these packages need to be loaded
 
@@ -170,6 +171,13 @@ ov_lrn14_2 <- ggpairs(lrn14_analysis, mapping = aes(col = gender), title = "Grap
 
 ov_lrn14_2 # show the graph
 ```
+![](C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/OV_plot_lrn14.png)
+  
+  
+The overview plot shows the data distribution of all observations of each variable with a histogramm, Q-plots (point diagrams) and the line graphs. The data colours represent the different gender of the students of the data frame. Here female students are shown in redish colour and male students in turquise colour.  
+In the upper right part of the overview graph the data correlations (all observations of one variable correlating to the observations of another varibable) is shown. These results give a first hint which variable might show a significant regression analysis result.
+  
+  
 ```
 # Save the overview plot
 
@@ -204,75 +212,121 @@ summary(gen_lm) # not significant
 age_lm <- lm(points ~ age, data = lrn14_analysis)
 summary(age_lm) # not significant
 ```  
-``` {r, regression1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+  
+These regression analysis did not result in significant outcomes. Next the I performed the regression analysis of points ~ attitude. This had following outcome:
+  
+``` {r, regression1sum, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
 # attitude
 att_lm <- lm(points ~ attitude, data = lrn14_analysis)
-summary(att_lm)
+att_lm_res <- summary(att_lm)
+att_lm_res
 
-par(mfrow = c(2,2))
-plot(att_lm, which = c(1,2,5), main = "Diagnostic plots points ~ attitude")
+knitr::kable(att_lm_res$coefficients, digits=3, caption="Regression coefficients point ~ attitude")
+```
+
+
+  
+Here the diagnostic plots of the regression model **points ~ attitude**:
+  
+``` {r, regression1plot, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+plot(att_lm, which = c(1,2,5))
 ```
   
-#####  Regression model **point ~ attitude** interpretation  
+  
+#####  Regression model **point ~ attitude** interpretation:  
 
-Significant outcome was shown in the simple regression analysis of point ~ attitude  
+Significant outcome was shown in the simple regression analysis of point ~ attitude.  
 
+The summary of the regression model shows that the estimate increase of points by a value of 1 of attitude is 3.525.
+The p-value of 4.12e-09 *** represents that as asignificant result (it's pretty much 0). So the students' attitude (relating statistics) has a significant influence in the exam points outcome. So depending on the attitude the student has a higher number of points or a lower one. But the intercept shows a value of 11.63 - so even with zero attitude a student would still reach a level of 11 points at an exam.  
+The multiple R-squared represents the correlation coefficient. It is the square root of R-squared (the coefficient of determination). The multiple R-squared explains how strong the linear relationship is, which would be strongest with a value of 1 and weakest with a value of 0 (no relationship). Here the value is 0.1906, so not a very strong relationship, but it has an effect.  
 
+The diagnostic plots consist of a "Residual vs. Fitted plot which is used to check the linearity (or non-linearity) of the observations, eventual variance errors (observations which concentrate in a certain direction) and you can also check if there are possible outliers in your dataset.  
+The resulting plots of our points ~ attitude model show a good linearity and a good variance. The observations are nicely distributed over the base line and you cannot see any direction were the points might show a variance difference. There are also three outliers (145, 56, 35), but these are not disturbing the analysis and don't have to be removed since they are still centered in the overall data point distribution.  
+The Normal Q-Q plot helps us to check the data distribution of our dataset (normal distributed or exponential). Our datapoints are nicely distributed over the line and are normal distributed. That means that our analysis does not need any transformed data points before any further statistical analysis (for example logarithm or square root transformation).  
+The Residual vs. Leverage plot helps us to identify if there are observations which might have a high impact on a statistical model. So the observations in our case show very low leverage and even the points which are further away from the others show low leverage and so cannot be considered as outliers.
 
-
+Additionally here is a plot representing points vs. attitude with the regressions line. For me it makes it easier to understand the whole thing when the data is shown is a graph.
+  
+```{r, qplot_points_attitude, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+library(ggplot2)
+qplot(attitude, points, data = lrn14_analysis) + geom_smooth(method = "lm")
+```
+  
+In the graph someone can check if the estimate increase of 3.525 per one unit of attitude is shown by the regression line.  
+  
 ***    
 
-#### 2.3.2. Multiple regression model of **point ~ attitude + stra**
+#### 2.3.2. Multiple regression model of **point ~ attitude + stra**  
+  
+Here I'm checking the linear regression of points ~ attitude and strategic learning approach outcome - I want to know if the strategic learning approach has a relationship to the exampoints of the students.
 
-```{r, regression2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+```{r, regression2sum, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
 # points ~ attitude + stra ----
 
 att_st_lm <- lm(points ~ attitude + stra, data = lrn14_analysis)
-summary(att_st_lm)
+att_st_lm_res <- summary(att_st_lm)
+att_st_lm_res
 
-par(mfrow = c(2,2))
-plot(att_st_lm, which = c(1,2,5), main = "Diagnostic plots points ~ attitude + stra")
+knitr::kable(att_st_lm_res$coefficients, digits=3, caption="Regression coefficients point ~ attitude + stra")
 ```
-
-
-
-
-
-
-
-
-
-#####  Regression model **point ~ attitude + stra** interpretation  
-***
-
-#### 2.3.3. Multiple regression model of **point ~ attitude + deep + surf + stra**
-
-```{r, regression3, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
-# points ~ attitude + deep + surf + stra ----
-
-att_de_su_st_lm <- lm(points ~ attitude + deep + surf + stra, data = lrn14_analysis)
-summary(att_de_su_st_lm)
-
-par(mfrow = c(2,2))
-plot(att_de_su_st_lm, which = c(1,2,5))
-```
-
-
-
-
-
-
-#####  Regression model **point ~ attitude + deep + surf + stra** interpretation  
   
+Here the diagnostic plots of the regression model **points ~ attitude + stra**:  
 
+``` {r, regression2plot, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
 
+plot(att_st_lm, which = c(1,2,5))
+```
+  
+  
+#####  Regression model **point ~ attitude + stra** interpretation:    
 
-
-
-
-
+In this multiple regression I wanted to see if the strategic learning approach shows an influence on the amount of exampoints a student can reach. The outcome shows that the strategic learning approach has some influence but not a very strong one. Also the p-value of 0.08 shows that the significance of the influence is not very strong.
+The multiple R-squared is a bit higher compared to points ~ attitude regression model so we have a little higher correlations if we put the strategic learning approach into account.  
+The diagnostic plots show more or less the same results as in the regression model point ~ attitude. Data is normal distributed and no outliers are significantly disturbing the analysis.  
 
 ***
-- Describe your work and results clearly. 
-- Assume the reader has an introductory course level understanding of writing and reading R code as well as statistical methods.
-- Assume the reader has no previous knowledge of your data or the more advanced methods you are using.
+
+#### 2.3.3. Multiple regression model of **point ~ deep + surf + stra**   
+
+In the third regression model I put points vs. deep, surface and strategic learning approach into account. Does the combination of deep, surface and strategic learning approach have an influence in the exampoints of students.
+
+```{r, regression3sum, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+# points ~ + deep + surf + stra ----
+
+de_su_st_lm <- lm(points ~ deep + surf + stra, data = lrn14_analysis)
+de_su_st_lm_res <- summary(de_su_st_lm)
+
+de_su_st_lm_res
+
+knitr::kable(de_su_st_lm_res$coefficients, digits=3, caption="Regression coefficients point ~ deep + surf + stra")
+```
+
+
+Here the diagnostic plots of the regression model **points ~ + deep + surf + stra**:  
+
+``` {r, regression3plot, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+
+plot(de_su_st_lm, which = c(1,2,5))
+```
+    
+#####  Regression model **point ~ deep + surf + stra** interpretation:  
+  
+The outcome of this regression model shows that with a minor significance (0.0762) the surface learning approach has some indluence to the exam outcomes of students. Checking the estimate for surf show a negative value of -1.63 which means that students with a surface learning approach tent to have 1.6 points less as a test result with a increased surface learning approach value of 1. The deep learning approach seem to have no influence at all in the amount of points students reach at the exams and the stratetic approach has a non-significant positive influence.  
+The multiple R-squared of 0.04 is very low and explains that there is more or less no correlation between these variables and the exampoints from the students.
+
+Here I put the three variables into a `qplot()` to show the relationsships of the learning approaches and the exampoints.  
+
+```{r, qplot_points_surf, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+library(ggplot2)
+par(mfrow = c(2,2))
+qplot(deep, points, data = lrn14_analysis) + geom_smooth(method = "lm") + ggtitle("Points vs. deep learning approach")
+qplot(surf, points, data = lrn14_analysis) + geom_smooth(method = "lm")+ ggtitle("Points vs. surface learning approach")
+qplot(stra, points, data = lrn14_analysis) + geom_smooth(method = "lm")+ ggtitle("Points vs. strategic learning approach")
+```
+  
+So, this was a trial to analyse the dataset with simple and multiple regression models. I hope the interpretations are easily understood and the diary structure is not confusing you.  
+I had fun preparing this first statistics and graph chapter and I'm looking forward to learn more...  
+  
+***
+
