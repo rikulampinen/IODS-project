@@ -7,5 +7,24 @@
 ***
 ## 1. Data wrangling
 
-R script is available on my github repository. To get to the script click [here]()
+R script is available on my github repository. To get to the script click [here](https://github.com/rikulampinen/IODS-project/blob/master/data/create_alc.R)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

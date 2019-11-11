@@ -330,4 +330,3 @@ qplot(stra, points, data = lrn14_analysis) + geom_smooth(method = "lm")+ ggtitle
 So, this was a trial to analyse the dataset with simple and multiple regression models. I hope the interpretations are easily understood and the diary structure is not confusing you.  
 I had fun preparing this first statistics and graph chapter and I'm looking forward to learn more...  
   
-***
