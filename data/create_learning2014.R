@@ -144,7 +144,7 @@ library(GGally)
 ?ggpairs
 
 ov_lrn14_2 <- ggpairs(lrn14_analysis, mapping = aes(col = gender, ), title = "Graphical overview of lrn14_analysis", 
-                      lower = list(combo = wrap("facethist", bins = 20))) 
+                      lower = list(combo = wrap("facethist", bins = 20)), upper = list(continuous = wrap("cor", size = 2.8))) 
 
 ov_lrn14_2
 

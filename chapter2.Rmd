@@ -1,4 +1,6 @@
-# Chapter 2: Data wrangling and performing a regression analysis
+# Chapter 2: Regression and model validation
+
+### Data wrangling and regression analysis 
 
 #### *Work of week 45 (4.11. - 10.11.2019)*
 
@@ -165,9 +167,9 @@ For a graphical overview of the dataset I used the `ggpairs()` function which re
 library(ggplot2) 
 library(GGally) # to show the graph these packages need to be loaded
 
-ov_lrn14_2 <- ggpairs(lrn14_analysis, mapping = aes(col = gender), title = "Graphical overview of lrn14_analysis", 
-                      lower = list(combo = wrap("facethist", bins = 20))) 
-                      # the color is chosen according to the different gender
+ov_lrn14_2 <- ggpairs(lrn14_analysis, mapping = aes(col = gender, ), title = "Graphical overview of lrn14_analysis", 
+                      lower = list(combo = wrap("facethist", bins = 20)), 
+                      upper = list(continuous = wrap("cor", size = 2.8)))
 
 ov_lrn14_2 # show the graph
 ```
