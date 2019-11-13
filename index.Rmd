@@ -25,7 +25,7 @@ output:
 ***
 
 
-```{r child = "chapter3.Rmd", results='hide'}
+```{r child = "chapter3.Rmd"}
 ```
 
 ***

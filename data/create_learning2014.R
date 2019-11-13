@@ -41,7 +41,7 @@ colnames(lrn14_analysis) <- c("gender", "age", "attitude", "points") # change of
 ## use %>% more often!!
 
 # e.g.
-lrn14_analysis <- lrn14_analysis %>% rename(Age = age, Points = points) # pipe is a good way for data handling!!
+#lrn14_analysis <- lrn14_analysis %>% rename(Age = age, Points = points) # pipe is a good way for data handling!!
 
 
 # define questions (observations from variables) acc. instructions

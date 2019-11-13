@@ -9,10 +9,272 @@
 
 R script is available on my github repository. To get to the script click [here](https://github.com/rikulampinen/IODS-project/blob/master/data/create_alc.R)
 
+***
+
+## 2. Analysis  
+
+### 2.1. Read the prepared data set
+
+The working directory is set using `setwd()` and the data file "alc" prepared in the data wrangling part is read using `read.table()`function. Afterwards the data frame is checked.
+
+```{r, setwd, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+setwd("C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/")
+getwd()
+```
+
+```{r, readdata, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+alc <- read.table(file = 
+       "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/alc_table.txt", stringsAsFactors = TRUE) 
+       # read the data file and leave the binary values as they are
+
+# Check the data frame
+dim(alc)
+str(alc)
+colnames(alc)
+``` 
+  
+The data frame consists of 35 variables with 382 observations.
+  
+### 2.2. The data set
+
+The provided data is from a approach on student achievement in secondary education in two Portugal schools.  
+It was collected with school reports and questionaires and it includes:  
+  
+* student grades
+* demographic features
+* social features
+* school related features  
+  
+The data consists of two data sets regarding the students' performance in Mathematics (mat) and Portuguese language (por). In a publication by [Cortez & Silva, 2008](http://www3.dsi.uminho.pt/pcortez/student.pdf) this data was already used.  
+  
+In the data wrangling part of this exercise the two data sets of mat and por were merged into one data set named "alc".  Columns (variables) which were not used in merging the data set were combined by averaging.
+Since we are interested to analyse the alcohol consumption of the students we created two new variables in the data set:  
+
+* "alc_use"  --> calculated average of weekday ("Dalc") and weekend ("Walc") alcohol consumption  
+* "high_use" --> logical values created as TRUE or FALSE depending if the "alc_use" of a student is higher than 2  
+
+All other variables are explained in detail [here](https://archive.ics.uci.edu/ml/datasets/Student+Performance) (check attribute information).  
+  
+***
+  
+### 2.3. Performing the analyses
+
+### 2.3.1. Choose variables for the analyses
+
+The task of this exercise is to figure out the relationships between high and low alcohol consumption and other variables in this data set.
+I have choosen to run the analyses on following four variables:  
+
+* age - student's age (numeric: from 15 to 22) 
+* Pstatus - parent's cohabitation status (binary: 'T' - living together or 'A' - apart)
+* failures - number of past class failures (numeric: n if 1<=n<3, else 4)
+* famrel - quality of family relationships (numeric: from 1 - very bad to 5 - excellent) 
+
+Extra variables checked:
+
+* absences - number of school absences (numeric: from 0 to 93) 
+* G3 - final grade (numeric: from 0 to 20, output target)
+
+
+I have choosen these four variables for the data analyses. First, the student's age might have kind a great influence on the alcohol consumption, since in the last couple of years the problem with younger consumers increased. Second, I think the living situation of the parents ("Pstatus") and the overall quality of family relationships ("famrel") might have a huge effect on  a students alcohol consumption. I know, this is a very, very conservative point of view but in a country like Portugal (catholic, maybe more patriachic family structures) that might have an influence.  
+The other variables I have choosen are the number of class failures ("failures") of a student. Someone who fails in school more often might have a higher alcohol consumption then others (personal opionion) both as a causation of higher use or as a response to failure.
+  
+### 2.3.2. Explore the distributions of the chosen variables numerically and graphically
+
+The task is to explore the distribution of the variables I have choosen and the relationship with alcohol consumption numerically and graphically.  
+
+```{r, loadpackage, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+library(kableExtra)
+```
+
+First I check how many female and male students are there:  
+  
+  
+```{r, exploredata1,  echo=FALSE, results='markdown', message=FALSE, warning=FALSE}
+# check the number of female and male students
+alc %>% group_by(sex) %>% summarise(count = n()) -> fm
+knitr::kable(fm, caption="Student count") %>% kable_styling(bootstrap_options = "striped", full_width = F, position = "lef")
+```
+***
+  
+
+```{r, exploredata2,  echo=FALSE, results='markdown', message=FALSE, warning=FALSE}
+# alc_use general shown with gender
+ggplot(data = alc, aes(x = alc_use, fill = sex)) + geom_bar() + xlab("Average alcohol consumption (1 = lowest / 5 = highest)") + ggtitle("General alcohol consumption")
+```  
+  
+The graph shows the average alcohol consumption count of the students. 1 is the lowest consumption, 5 the highest consumption. The amount of students with a low consumption is around 130 of 385.  
+
+*** 
+  
+```{r, exploredata3,  echo=FALSE, results='markdown', message=FALSE, warning=FALSE}
+# high_use by gender
+ggplot(data = alc, aes(x = high_use)) + facet_wrap("sex") + geom_bar() + xlab("High alcohol consumption") + ggtitle("High alcohol consumption by gender") + ylab("Count")
+```
+  
+This graph shows the high alcohol consumption (> 2) by students gender. You can see that the amount of male students with a high alcohol consumption is higher compared to female students.  
+
+***
+  
+
+```{r, exploredata4,  echo=FALSE, results='markdown', message=FALSE, warning=FALSE}
+# gather columns into key-value pairs and draw a bar plot of the variables
+gather(alc) %>% ggplot(aes(x = value)) + facet_wrap("key", scales = "free") + geom_bar(fill = "darkgreen", alpha = 0.7) + ggtitle("Overview bar plot of gathered variables") + xlab("Value") + ylab("Count")
+``` 
+  
+This bar plot gives us an overview over the different variables and might give a hint which variables have a strong relationship with alcohol consumption.
+  
+***
+
+```{r, exploredata5,  echo=FALSE, results='markdown', message=FALSE, warning=FALSE}
+# check with a box plot the data on higu alcohol use and the choosen variables
+# student's age
+
+ggplot(data = alc, aes(x = high_use, y = age, fill = sex)) + geom_boxplot()  + ggtitle("Student's high alcohol use by age and sex") + xlab("High alcohol consumption") + ylab("Student's age")
+```
+  
+Male students in the age from 16 - 18 year tent to have a high alcohol consumption. The age of female students with a high alcohol use is lower. In both cases also older students have a higher consumption. 
+
+***
+
+```{r, exploredata6,  echo=FALSE, results='markdown', message=FALSE, warning=FALSE}
+# check with a box plot the data on higu alcohol use and the choosen variables
+# parental status
+
+ggplot(data = alc, aes(x = Pstatus,  fill = sex)) + facet_wrap("high_use") + geom_bar()  + ggtitle("Student's high alcohol use by parental status and sex") + xlab("Parent's status (T = living together or A = apart)") + ylab("Count")
+```
+  
+The parent's cohabition status seems not to have such a big effect on the Student's high alcohol use. The high alcohol use is even higher within the group of students which parents are living together. So I will not use this variable anymore for my analysis.
+  
+***
+
+```{r, exploredata7,  echo=FALSE, results='markdown', message=FALSE, warning=FALSE}
+# past class failures
+ggplot(data = alc, aes(x = high_use, y = failures, fill = sex)) + geom_violin()  + ggtitle("Student's class failures by high alcohol use and sex") + xlab("High alcohol consumption") + ylab("Class failures")
+```
+  
+What is seen in this graph is that students with higher alcohol consumptuion tent to have a higher class failing rate. Female students with higher alcohol use have a higher count at 1 failure, male students have a higher count at 2 failures or 3 failures. 
+
+Generally, you see that students which have no high alcohol consumption fail less in classes.
+
+***
+
+```{r, exploredata8,  echo=FALSE, results='markdown', message=FALSE, warning=FALSE}
+# students family relationship quality
+ggplot(data = alc, aes(x = famrel,  fill = sex)) + geom_bar() + facet_wrap("high_use") + ggtitle("Student's family relationship quality by high alcohol consumption and sex") + xlab("Quality of family relationships (1 = very bad / 5 = excellent)") + ylab("Count")
+```
+  
+There are more students with a low alcohol conumption where the family relationship is good (4-5). Interestingly the amount of students with high alcohol consumption is also increasing with the quality of the family relationship status (higher count at status 3-5).
+  
+***
+  
+```{r, exploredata9,  echo=FALSE, results='markdown', message=FALSE, warning=FALSE}
+# boxplot of high_use and school absences
+ggplot(alc, aes(x = high_use, y = absences, fill = sex))+ geom_violin() + ylab("School absences") + xlab("High alcohol consumption") + ggtitle("Student absences by alcohol consumption and sex")
+```
+
+High alcohol use seems to have an influence on the rate of school absences. Students with a higher alcohol consumption have an increased absance amount. Females tent to be more absent than males, also if they don't fall in the group of high alcohol consumers.
+
+***
+
+```{r, exploredata10,  echo=FALSE, results='markdown', message=FALSE, warning=FALSE}
+# boxplot of high_use and final grade
+ggplot(alc, aes(x = high_use, y = G3, fill = sex))+ geom_boxplot() + ylab("Final grade") + xlab("High alcohol consumption") + ggtitle("Student's final grade by aclohol consumption and sex")
+```
+  
+The final grad of students with low alcohol consumption are stable between genders. Male students with higher alcohol consumption show lower final grades.
+
+***
+  
+### 2.3.3. Logistic regression - explore the relationship between the choosen variables and the alcohol consumption
+
+#### High alcohol consumption and choosen variables
+
+**1. Calculation of the logistic regression model. I'm using in the model the 4 variables I have choosen before + absences and final grade**
+
+```{r, glm1,  echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+cv_glm <- glm(high_use ~ age + Pstatus + failures + famrel + absences + G3, data = alc, family = "binomial")
+
+# Summary of the model
+cv_glm_sum <- summary(cv_glm)
+```
+
+```{r, output, echo=FALSE, results='markdown', message=FALSE, warning=FALSE}
+# print out the coefficients of the model
+
+knitr::kable(cv_glm_sum$coefficients, digits = 3, align = "l", justify = "left", caption="Model coefficients of choosen variables") %>% kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+```
+  
+***
+  
+**2. Calculating the odds ratios**
+
+```{r, odds, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+
+# compute odds ratios (OR)
+or_cv <- coef(cv_glm) %>% exp
+or_cv 
+
+# compute confidence intervals (CI)
+ci_cv <- confint(cv_glm) %>% exp
+ci_cv
+```
+
+```{r, output2, echo=FALSE, results='markdown', message=FALSE, warning=FALSE }
+# print out the odds ratios with their confidence intervals
+od_conf <- cbind(or_cv, ci_cv) 
+colnames(od_conf) <- c("odds ratios","2.5 %", "97.5 %")
+knitr::kable(od_conf, digits = 3, align = "l",  caption="Odds ratios and confidental intervals") %>% kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+```
+   
+***
+
+**3. Explore the predictive power of the model**
+
+```{r, prediction, echo=FALSE, results='markdown', message=FALSE, warning=FALSE}
+# predict() the probability of high_use
+probabilities <- predict(cv_glm, type = "response")
+
+# add the predicted probabilities to 'alc'
+alc <- mutate(alc, probability = probabilities)
+
+# use the probabilities to make a prediction of high_use
+alc <- mutate(alc, prediction = probability > 0.5)
+
+# check the updated data frame (last ten observations)
+select(alc, age, Pstatus, failures, famrel, high_use, probability, prediction) %>% tail(10)
+
+# tabulate the target variable versus the predictions
+pred2_2 <- table(high_use = alc$high_use, prediction = alc$prediction)
+pred2_2
+
+knitr::kable(pred2_2, align = "l",  caption="2 x 2 cross tabulation" ) %>% kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>% add_header_above(c(" " = 1, "Prediction" = 2)) %>%  pack_rows("high use", 1, 2)
+
+```
+  
+***
+  
+**4. Graphic visualization of actual values and predictions**
+
+```{r, prediction_graph, echo=FALSE, results='markdown', message=FALSE, warning=FALSE }
+# initialize a plot of 'high_use' versus 'probability' in 'alc'
+g <- ggplot(alc, aes(x = probability, y = high_use, col = prediction))
+
+# define the geom as points and draw the plot
+g + geom_point()
+
+# tabulate the target variable versus the predictions (tvp)
+tvp <- table(high_use = alc$high_use, prediction = alc$prediction) %>% prop.table() %>% addmargins()
+
+knitr::kable(tvp, align = "l",  caption="2 x 2 cross tabulation" ) %>% kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>% add_header_above(c(" " = 1, "Prediction" = 3)) %>%  pack_rows("high use", 1, 3)
+```
 
 
 
-
+### 2.3.4. Logistic regression - 
 
 
 
