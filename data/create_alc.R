@@ -144,3 +144,5 @@ write.table(alc,
 # Check if the file can be read
 read.table(file = 
            "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/alc_table.txt") %>% head()
+
+
