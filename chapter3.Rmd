@@ -110,7 +110,7 @@ knitr::kable(fm, caption="Students") %>% kable_styling(bootstrap_options = "hove
 gather(alc) %>% ggplot(aes(x = value)) + facet_wrap("key", scales = "free") + geom_bar(fill = "darkgreen", alpha = 0.7) + ggtitle("Overview bar plot of gathered variables") + xlab("Value") + ylab("Count") -> alc_gather
 
 ggsave("alc_gather.png", 
-       plot = alc_gather, path = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/", scale = 1,
+       plot = alc_gather, path = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/", scale = 2,
        dpi = 300)
 ``` 
 ![](C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/alc_gather.png)
@@ -170,18 +170,16 @@ There are more students with a low alcohol conumption where the family relations
 
 ```{r, exploredata7,  echo=FALSE, results='markdown', message=FALSE, warning=FALSE}
 # boxplot of high_use and school absences
-ggplot(alc, aes(x = high_use, y = absences, fill = sex))+ geom_violin() + ylab("School absences") + xlab("High alcohol consumption") + ggtitle("Student absences by alcohol consumption") + scale_fill_discrete("Student's gender", labels = c("Female", "Male"))
+ggplot(alc, aes(x = high_use, y = absences, fill = sex)) + geom_violin() + ylab("School absences") + xlab("High alcohol consumption") + ggtitle("Student absences by alcohol consumption") + scale_fill_discrete("Student's gender", labels = c("Female", "Male"))
 ```
 
 High alcohol use seems to have an influence on the rate of school absences. Students with a higher alcohol consumption have an increased absance amount. Females tent to be more absent than males, also if they don't fall in the group of high alcohol consumers.
 
 ***
 
-## 2.3.3. Logistic regression - explore the relationship between the choosen variables and the alcohol consumption
+## 2.3.3. Logistic regression - explore the relationship between the choosen variables and the high alcohol consumption
 
-### High alcohol consumption and choosen variables
-
-**1. Calculation of the logistic regression model.**  
+### 2.3.3.1. Calculation of the logistic regression model   
 **I'm using in the model the four variables I have choosen: sex, failures, famrel and absences**
 
 ```{r, glm1,  echo=TRUE, results='hide', message=FALSE, warning=FALSE}
@@ -201,16 +199,16 @@ knitr::kable(cv_glm_sum$coefficients, digits = 3, align = "l", justify = "left",
     
 The model output shows nice results and also significant one. So which variables influance high alcohol consumption?  
 
-* Being a male student is significantly (p = 5.37e-05 ***) increases the probability of high alcohol consumption by ~1.
-* Class failure have a smaller probability but still have a positive effect on high consumption (p = 0.0243 *)
-* The quality of family relationships has a negative effect on high alcohol consumption (p = 0.0314 *)
-* School absences show also a significant positive effect on high alcohol consumption (5.83e-05 ***)
+* Being a male student significantly (p = 5.37e-05 ***) increases the probability of high alcohol consumption by ~1.
+* Class failure have a smaller probability but still have a positive effect on high consumption (p = 0.0243 *).
+* The quality of family relationships has a negative effect on high alcohol consumption (p = 0.0314 *).
+* School absences show also a significant positive effect on high alcohol consumption (5.83e-05 ***).
 
 This is a first result. But we are not going to use these results as our final interpretation of the logistic regression. We are checking now the odds ratios of the model.
 
 ***
   
-**2. Calculating the odds ratios**
+### 2.3.3.2. Calculating the odds ratios
 
 ```{r, odds, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
 
@@ -243,10 +241,10 @@ The odds ratios of this logistic model lead to following interpretation.
 
 ***
 
-**3. Explore the predictive power of the model**
+### 2.3.3.3. Explore the predictive power of the model
 
 I calculated the probability of high alcohol use and added the data to the "alc" data frame. Then the prediction of a high alcohol consumption is defined to be a probability greater than 0.5 and also added this outcome to the "alc" data frame.  
-Here the last 20 data points with the probability and prediction outputs:
+Here are the last 20 data points with the probability and prediction outputs:
 ```{r, prediction, echo=FALSE, results='markdown', message=FALSE, warning=FALSE}
 # predict() the probability of high_use
 probabilities <- predict(cv_glm, type = "response")
@@ -270,83 +268,259 @@ knitr::kable(pred2_2, align = "l",  caption="2 x 2 cross tabulation" ) %>% kable
 
 ```
  
-Interpretation of the prediction: 
-
-true high use --> false negative --> 82 --> more important in this case 82 are predicted not do have high alc use but they are having high alcohol consumption
-
-
-false high use --> false negative --> 15
-
-
-
+Interpretation of the prediction:  
+The 2 x 2 cross table gives us the results of the model prediction for high alcohol consumption compared to the real numbers.  
+The model resulted in 253 correct false results and 82 false negative results. This means that the prediction fails to be correct. In 82 cases the model predicted that the student has no high alcohol consumption, but the student actually has high alcohol consumption. This false negative results should be much smaller.  
+In 15 cases the model predicts high alcohol consumption but is wrong, that's a false positive prediction.
+253 cases were correctly predicted as false and 32 as true for high alcohol consumption.  
 
 ***
   
-**4. Graphic visualization of actual values and predictions**
+### 2.3.3.4. Graphic visualization of actual values and predictions
 
 ```{r, prediction_graph, echo=FALSE, results='markdown', message=FALSE, warning=FALSE }
 # initialize a plot of 'high_use' versus 'probability' in 'alc'
-g <- ggplot(alc, aes(x = probability, y = high_use, col = prediction))
+ggplot(alc, aes(x = probability, y = high_use, col = prediction)) + geom_point() + xlab("Probability value") + ylab("High alcohol use") + ggtitle("High alcohol use versus probability") + scale_color_discrete("Prediction")
+```
+  
+The graph represent the 2x2 cross table in a graphical view with the false negative values on top left of the graph. 82 cases predicted at FALSE but with a TRUE high alcohol use.  
+  
 
-# define the geom as points and draw the plot
-g + geom_point() + xlab("Probability value") + ylab("High alcohol use") + ggtitle("High alcohol use versus probability")
-
+```{r, target_variable, echo=FALSE, results='markdown', message=FALSE, warning=FALSE }
 # tabulate the target variable versus the predictions (tvp)
 tvp <- table(high_use = alc$high_use, prediction = alc$prediction) %>% prop.table() %>% addmargins()
 
 knitr::kable(tvp, digits = 4, align = "l",  caption="Target variable versus the predictions" ) %>% kable_styling(bootstrap_options = "striped", full_width = F, position = "center") %>% add_header_above(c(" " = 1, "Prediction" = 3)) %>%  pack_rows("high use", 1, 3)
 ```
   
-Is the prediction of high alcohol use correct of not?
+Is the prediction of high alcohol use correct of not?  
+This propability table gives us the correct predictions, false negative and false positive values as fractions of the total number. Results in fraction values between 0 and 1.  
+So 21.5 % of are false negative predictions! 3.9 % are false positive predictions.
 
 ***
 
-**5. Compute the loss function** 
+### 2.3.3.5. Computing the loss function - testing error
 
+To measure the performance of of the logistic regression model we perform the loss function to calculate the average number of wrong predictions of our model.  
 
-loss function
+This results to following value:
 
+```{r, loss_function, echo=FALSE, results='markdown', message=FALSE, warning=FALSE }
+# define a loss function (mean prediction error)
+loss_func <- function(class, prob) {
+  n_wrong <- abs(class - prob) > 0.5
+  mean(n_wrong)
+}
+
+# call loss_func to compute the average number of wrong predictions in the (training) data
 loss_func(class = alc$high_use, prob = alc$probability)
-[1] 0.2565445 --> every 4th prediction is false --> 25% of predictions are false!
---> percentage of false prediction
-
-
-
-
-**6. Cross validation**
-
-average number of wrong predictions in the cross validation
-> cv$delta[1]
-[1] 0.2565445 --> percentage of false predictions
-
-cross validation tells us if the model is too much in the data --> if the model is more generalized the value of cross validation shall be higher that the loss function result
-
-
-with the cross validation you check your model with the same data - the outcome should be higher number than the loss function --> that shows that the model is not too much in the data --> so the model is more kind of a general one!!
+```
+  
+So 25.4% of all predictions are wrong! Every fourth prediction is incorrect (to check that you can calculate the sum of false positive and false negative values from the Target variable versus the predictions table: 21.5 + 3.9 = 25.4).  
+**So on the training data the model has a prediction error of 25.4 %.**
 
 ***
 
-## Additional graphs
+### 2.3.3.6. Cross validation - the training error
 
-```{r, exploredata8,  echo=FALSE, results='markdown', message=FALSE, warning=FALSE}
-# check with a box plot the data on higu alcohol use and the choosen variables
-# student's age
+Here we are testing the how good our model is on unseen data. The loss function value is computed on a data which we did not use to to train the model. If the value is low it is good! 
+We are performing the cross validation so that we test the logistic regression models on a defined set of observations. Here we choose the value of 10 - so the dataset will be split in 10 groups and 1 group of these 10 will be tested.
 
-ggplot(data = alc, aes(x = high_use, y = age, fill = sex)) + geom_boxplot()  + ggtitle("Student's high alcohol use by age and sex") + xlab("High alcohol consumption") + ylab("Student's age")
+```{r, cross_validation1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE }
+# K-fold cross-validation
+library(boot)
+cross_val<- cv.glm(data = alc, cost = loss_func, glmfit = cv_glm, K = 10)
 ```
-  
-Male students in the age from 16 - 18 year tent to have a high alcohol consumption. The age of female students with a high alcohol use is lower. In both cases also older students have a higher consumption. 
-  
-***  
 
-```{r, exploredata9,  echo=FALSE, results='markdown', message=FALSE, warning=FALSE}
-# check with a box plot the data on higu alcohol use and the choosen variables
-# parental status
-
-ggplot(data = alc, aes(x = Pstatus,  fill = sex)) + facet_wrap("high_use") + geom_bar()  + ggtitle("Student's high alcohol use by parental status and sex") + xlab("Parent's status (T = living together or A = apart)") + ylab("Count")
+The cross validation results to following value:
+```{r, cross_validation2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE }
+# average number of wrong predictions in the cross validation
+cross_val$delta[1]
 ```
+
+This is the average number of wrong predictions in the cross validation.
+**The prediction error on the testing data is higher compared to the training data!**  
+
+Be aware of it that this value is changing with each new computing because the function computes everytime another set of observations with the logistic regression model.  
+
+The cross validation tells us if the model is too much in the data --> if the model is more generalized the value of cross validation shall be higher than the loss function value. 
   
-The parent's cohabition status seems not to have such a big effect on the Student's high alcohol use. The high alcohol use is even higher within the group of students which parents are living together. So I will not use this variable anymore for my analysis.
-  
+With the cross validation you check your model with the same data - the outcome should be higher number than the loss function --> that shows that the model is not too much in the data --> so the model is more kind of a general one!
+
 ***
 
+## Bonus tasks
+
+### Bonus task 1
+
+The 10-fold cross-validation of my model was computed in section 2.3.3.6. above. My logistic model does not have a better performance compared to the DataCamp model (both have an error value of ~ 0.26).  
+
+I think a better model could be found - maybe more variables need to be used in the model, for example the age of the students or if students are in a relationship. These factors could make the model more accurate.  
+
+***
+
+### Bonus task 2
+
+#### Cross-validations with different logistic regression models
+
+```{r, model_table, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+model_graph <- data.frame("predictors" = c(8,7,6,5,4,3),
+                     "training_error" = c(8,7,6,5,4,3),
+                     "testing_error" = c(8,7,6,5,4,3))
+
+model_graph
+```
+
+**Model 1: 8 variables (sex, age, Pstatus, guardian, failures, famrel, freetime, absences)**
+
+```{r, cv_model8, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+#logistic regression model with 8 variables
+mod8_glm <- glm(high_use ~ sex + age + Pstatus + guardian + failures + famrel + freetime + absences, 
+                data = alc, family = "binomial")
+
+# predict() the probability of high_use
+probabilities8 <- predict(mod8_glm, type = "response")
+
+# add the predicted probabilities to 'alc'
+alc <- mutate(alc, probability8 = probabilities8)
+
+#calculate training error
+lf8 <- loss_func(class = alc$high_use, prob = alc$probability8)
+
+#calculate the testing error
+mod8_cross_val<- cv.glm(data = alc, cost = loss_func, glmfit = mod8_glm, K = 10)
+```
+
+**Model 2: 7 variables (sex, age, guardian, failures, famrel, freetime, absences) - Pstatus**
+
+```{r, cv_model7, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+#logistic regression model with 7 variables
+mod7_glm <- glm(high_use ~ sex + age + guardian + failures + famrel + freetime + absences, 
+                data = alc, family = "binomial")
+
+# predict() the probability of high_use
+probabilities7 <- predict(mod7_glm, type = "response")
+
+# add the predicted probabilities to 'alc'
+alc <- mutate(alc, probability7 = probabilities7)
+
+#calculate training error
+lf7 <- loss_func(class = alc$high_use, prob = alc$probability7)
+
+#calculate the testing error
+mod7_cross_val<- cv.glm(data = alc, cost = loss_func, glmfit = mod7_glm, K = 10)
+```
+
+**Model 3: 6 variables (sex, age, failures, famrel, freetime, absences) - Pstatus, guardian**
+
+```{r, cv_model6, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+#logistic regression model with 6 variables
+mod6_glm <- glm(high_use ~ sex + age + failures + famrel + freetime + absences, 
+                data = alc, family = "binomial")
+
+# predict() the probability of high_use
+probabilities6 <- predict(mod6_glm, type = "response")
+
+# add the predicted probabilities to 'alc'
+alc <- mutate(alc, probability6 = probabilities6)
+
+#calculate training error
+lf6 <- loss_func(class = alc$high_use, prob = alc$probability6)
+
+#calculate the testing error
+mod6_cross_val<- cv.glm(data = alc, cost = loss_func, glmfit = mod6_glm, K = 10)
+```
+
+**Model 4: 5 variables (sex, age, failures, freetime, absences) - Pstatus, guardian, famrel**
+
+```{r, cv_model5, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+#logistic regression model with 5 variables
+mod5_glm <- glm(high_use ~ sex + age + failures + freetime + absences, 
+                data = alc, family = "binomial")
+
+# predict() the probability of high_use
+probabilities5 <- predict(mod5_glm, type = "response")
+
+# add the predicted probabilities to 'alc'
+alc <- mutate(alc, probability5 = probabilities5)
+
+#calculate training error
+lf5 <- loss_func(class = alc$high_use, prob = alc$probability5)
+
+#calculate the testing error
+mod5_cross_val<- cv.glm(data = alc, cost = loss_func, glmfit = mod5_glm, K = 10)
+```
+
+**Model 5: 4 variables (sex, age, failures, absences) - Pstatus, guardian, famrel, freetime**
+
+```{r, cv_model4, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+#logistic regression model with 5 variables
+mod4_glm <- glm(high_use ~ sex + age + failures + absences, 
+                data = alc, family = "binomial")
+
+# predict() the probability of high_use
+probabilities4 <- predict(mod4_glm, type = "response")
+
+# add the predicted probabilities to 'alc'
+alc <- mutate(alc, probability4 = probabilities4)
+
+
+#calculate training error
+lf4 <- loss_func(class = alc$high_use, prob = alc$probability4)
+
+#calculate the testing error
+mod4_cross_val<- cv.glm(data = alc, cost = loss_func, glmfit = mod4_glm, K = 10)
+```
+
+**Model 6: 3 variables (sex, failures, absences) - Pstatus, guardian, famrel, freetime, age**
+
+```{r, cv_model3, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+#logistic regression model with 5 variables
+mod3_glm <- glm(high_use ~ sex + failures + absences, 
+                data = alc, family = "binomial")
+
+# predict() the probability of high_use
+probabilities3 <- predict(mod4_glm, type = "response")
+
+# add the predicted probabilities to 'alc'
+alc <- mutate(alc, probability3 = probabilities3)
+
+#calculate training error
+lf3 <- loss_func(class = alc$high_use, prob = alc$probability3)
+
+#calculate the testing error
+mod3_cross_val<- cv.glm(data = alc, cost = loss_func, glmfit = mod3_glm, K = 10)
+```
+  
+
+```{r, preparegraph, echo=FALSE, results='markdown', message=FALSE, warning=FALSE}
+# add the values to the model_graph data frame
+model_graph$training_error[1] <- lf8
+model_graph$testing_error[1] <-mod8_cross_val$delta[1]
+
+model_graph$training_error[2] <- lf7
+model_graph$testing_error[2] <-mod7_cross_val$delta[1]
+
+model_graph$training_error[3] <- lf6
+model_graph$testing_error[3] <-mod6_cross_val$delta[1]
+
+model_graph$training_error[4] <- lf5
+model_graph$testing_error[4] <-mod5_cross_val$delta[1]
+
+model_graph$training_error[5] <- lf4
+model_graph$testing_error[5] <-mod4_cross_val$delta[1]
+
+model_graph$training_error[6] <- lf3
+model_graph$testing_error[6] <-mod3_cross_val$delta[1]
+
+ggplot() + 
+  geom_line(aes(x = model_graph$predictors, y = model_graph$training_error), colour = "red", size = 1) + 
+  geom_line(aes(x = model_graph$predictors, y = model_graph$testing_error), colour = "green", size = 1 ) +
+  ylab("Training & testing error") +
+  xlab("Number of logistic model variables") + 
+  ggtitle("Training and testing error values")
+```       
+  
+The graph shows a red line representing the training error values and a green line representing the testing error values. You can see how the error values are changing. As more variables are used for the logistic regression model as higher the training and testing error becomes. It seems the model is then too "deep" in the data.
+
+***
