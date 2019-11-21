@@ -1,0 +1,180 @@
+# Chapter 4: Clustering and classification
+
+### Data wrangling and performing clustering and classification
+
+#### *Work of week 47 (18.11. - 24.11.2019)*
+
+***
+
+## 1. Analysis of Boston data set
+
+## 1.1. Load the data set 
+     
+```{r, dataload, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+# load necessary packages
+library(MASS) # package includes the Boston data set
+library(tidyr)
+library(dplyr)
+library(corrplot)
+library(ggplot2)
+library(GGally)
+library(knitr)
+library(kableExtra)
+
+data(Boston) # load the Boston data set
+str(Boston) # check the structure
+knitr::kable(head(Boston)) %>% 
+  kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") # check the data frame head
+knitr::kable(summary(Boston)) %>% 
+  kable_styling(bootstrap_options = "striped", position = "center") %>% 
+  scroll_box(width = "100%", height = "300px")# summary statistics
+```
+
+## 1.2. The data set
+
+Discription of the dataset
+
+
+
+### 1.2.1 Overview plots and data description
+  
+```{r, datacheck1, echo=FALSE, results='markdown', message=FALSE, warning=FALSE}
+# graphical overview of the Boston data set
+ov_boston <- ggpairs(Boston, mapping = aes(), title ="Overview of the Boston data set", 
+                     lower = list(combo = wrap("facethist", bins = 20)), 
+                     upper = list(continuous = wrap("cor", size = 2.8)))
+```
+
+```
+# Save the overview plot
+ggsave("OV_plot_Boston.png", 
+       plot = ov_boston, path = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/", scale = 4,
+       dpi = 300)
+
+```
+Gathered overview plot:
+  
+![](C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/OV_plot_Boston.png)
+  
+
+The overview olot gives following information:
+ 
+Distribution of variabes:
+ 
+Relationship between the variables:
+
+### 1.2.2. Data correlations of the Boston data set
+  
+```{r, datacheck2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+
+# calculate the correlation matrix and round it
+cor_matrix<-cor(Boston) %>% round(digits = 2)
+
+# print the correlation matrix
+knitr::kable(cor_matrix) %>% 
+  kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") %>% 
+  scroll_box(width = "100%", height = "300px")# summary statistics
+
+# Specialized the insignificant value according to the significant level
+p.mat <- cor.mtest(cor_matrix)$p
+
+# visualize the correlation matrix
+corrplot(cor_matrix, method="color", type="upper",  tl.cex = 0.6, p.mat = p.mat, sig.level = 0.01, title="Correlations of the Boston data set", mar=c(0,0,1,0))
+
+# correlations / colour shows the correlation value/ also the size indicates the correlation
+```
+  
+Insignificant values are shown with a cross in the square.  
+
+***
+
+## 1.3. Data set organisation
+
+### 1.3.1. Data standardization (scaling of the data set)
+
+Here we standardize the data set and print out summaries of the scaled data set.
+
+What is the scaling? Why is it done? Data transformation to make the values compareable.
+Log transformation for example changes the shape of the data distribution
+The target is that the mean of the values goes to 0 and the standarddeviation goes to 1.
+
+```{r, datascale, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+
+# center and standardize variables
+boston_scaled <- scale(Boston)
+
+# summaries of the scaled variables
+knitr::kable(summary(boston_scaled), caption="Scaled Boston data set") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center")  %>% 
+  scroll_box(width = "100%", height = "300px")
+
+# class of the boston_scaled object
+class(boston_scaled)
+
+# change the object to data frame
+boston_scaled <- as.data.frame(boston_scaled)
+
+knitr::kable(boston_scaled, caption="Scaled Boston data set") %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") %>% scroll_box(width = "100%", height = "300px")
+
+
+scaled_ov <- ggpairs(boston_scaled, mapping = aes(), title ="Overview of the Boston data set", 
+                     lower = list(combo = wrap("facethist", bins = 20)), 
+                     upper = list(continuous = wrap("cor", size = 2.8)))
+scaled_ov
+```
+
+***
+
+### 1.3.1. Create a categorical variable (crime rate)
+
+```{r, datadeal1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+# summary of the scaled crime rate
+summary(boston_scaled$crim)
+
+# create a quantile vector of crim and print it
+bins <- quantile(boston_scaled$crim)
+knitr::kable(bins, caption="Quantiles of crim") %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "left")
+
+# create a categorical variable 'crime'
+crime <- cut(boston_scaled$crim, breaks = bins, include.lowest = TRUE, labels = c("low", "med_low", "med_high", "high"))
+
+# look at the table of the new factor crime
+knitr::kable(table(crime), caption="Categorical variables of crime") %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "left")
+
+# remove original crim from the dataset
+boston_scaled <- dplyr::select(boston_scaled, -crim)
+
+# add the new categorical value to scaled data
+boston_scaled <- data.frame(boston_scaled, crime)
+```
+
+
+Quantiles
+25% 75% of the data distribution
+quantiles give the values how many values are in which part of the data distribution
+median - the center of the quantiles (were the upper and lower 50 % quantiles meet)
+
+
+***
+
+
+     
+     
+     
+linear discriminant analysis
+what does it do? Used for classification (some bo)
+  creates variable which characterize which variable discriminate most of the variables   
+     
+
+
+classification --> you have the classes for the training data available
+e.g. logistic regression is a classification (0 or 1) - but just 2 groups
+
+clustering --> you have training data which produces the clusters and these clusters can then be used for new data
+(data driven)
+it's a descriptive method
+
+trajectory analysis is clustering for example (data dependent)
+
+propensity scores is another method for classification
+
