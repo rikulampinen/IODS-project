@@ -8,8 +8,8 @@
 
 ## 1. Analysis of Boston data set
 
-## 1.1. Load the data set 
-     
+## 1.1. Load the data set & check the structure
+
 ```{r, dataload, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
 # load necessary packages
 library(MASS) # package includes the Boston data set
@@ -22,81 +22,101 @@ library(knitr)
 library(kableExtra)
 
 data(Boston) # load the Boston data set
-str(Boston) # check the structure
-knitr::kable(head(Boston)) %>% 
-  kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") # check the data frame head
-knitr::kable(summary(Boston)) %>% 
-  kable_styling(bootstrap_options = "striped", position = "center") %>% 
-  scroll_box(width = "100%", height = "300px")# summary statistics
 ```
-
+  
+***
+    
 ## 1.2. The data set
 
-Discription of the dataset
+The Boston data set consists of 14 variables with 506 observations. The data is bout housing values in Boston suburbs.
+The data set has following variables (columns):  
 
+* *crim*: the per capita crime rate by town   
+* *zn*: proportion of residential land zoned for lots over 25,000 sq.ft  
+* *indus*: proportion of non-retail business acres per town  
+* *chas*: Charles River dummy variable (= 1 if tract bounds river; 0 otherwise)  
+* *nox*: nitrogen oxides concentration (parts per 10 million)  
+* *rm*: average number of rooms per dwelling  
+* *age*: proportion of owner-occupied units built prior to 1940  
+* *dis*: weighted mean of distances to five Boston employment centres  
+* *rad*: index of accessibility to radial highways  
+* *tax*: full-value property-tax rate per \$10,000  
+* *ptratio*: pupil-teacher ratio by town  
+* *black*: 1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town  
+* *lstat*: lower status of the population (percent)  
+* *medv*: median value of owner-occupied homes in \$1000s  
 
+We are interested in the later analysis on the per capita crime rate. Overall the crime rate is low and the data distribution is high on the low crime rate.
 
-### 1.2.1 Overview plots and data description
+```{r, datacheck1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+str(Boston) # check the structure
+knitr::kable(head(Boston)) %>% 
+  kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") # the data frame head
+knitr::kable(summary(Boston)) %>% 
+  kable_styling(bootstrap_options = "striped", position = "center", font_size = 11) %>% 
+  scroll_box(width = "100%", height = "300px")# summary statistics
+```
   
-```{r, datacheck1, echo=FALSE, results='markdown', message=FALSE, warning=FALSE}
+***
+  
+### 1.2.1 Overview plot and data description
+    
+```{r, datacheck2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
 # graphical overview of the Boston data set
 ov_boston <- ggpairs(Boston, mapping = aes(), title ="Overview of the Boston data set", 
                      lower = list(combo = wrap("facethist", bins = 20)), 
                      upper = list(continuous = wrap("cor", size = 2.8)))
 ```
-
-```
-# Save the overview plot
-ggsave("OV_plot_Boston.png", 
-       plot = ov_boston, path = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/", scale = 4,
-       dpi = 300)
-
-```
-Gathered overview plot:
-  
+<center>  
 ![](C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/OV_plot_Boston.png)
+</center> 
+
+```{r, datacheck3, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
+# overview plot of interesting data
+bos_detail <- Boston[,c("crim","dis","tax","medv")]
+
+ov_bos_detail <- ggpairs(bos_detail, mapping = aes(),lower = list(combo = wrap("facethist", bins = 20)), 
+                     upper = list(continuous = wrap("cor", size = 5)))
+ov_bos_detail
+```
+
+The overview plot of the interesting data (for me) gives following information and the histograms give following information:
+the crime rate has the highest distribution on the low crime rate level. There might be some relationship with the distance to employment center. The tax rate has a high count on a lower level, decreases with a higher tax and has again a higher count on high taxes. The median value of the owner-occupied homes has a maximum count around 20000$. Tax and crime rate show a correlation of 50%.
   
-
-The overview olot gives following information:
- 
-Distribution of variabes:
- 
-Relationship between the variables:
-
+***
+  
 ### 1.2.2. Data correlations of the Boston data set
   
-```{r, datacheck2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+```{r, datacheck4, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
 
 # calculate the correlation matrix and round it
 cor_matrix<-cor(Boston) %>% round(digits = 2)
 
 # print the correlation matrix
-knitr::kable(cor_matrix) %>% 
+knitr::kable(cor_matrix, caption="Correlation matrix values") %>% 
   kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") %>% 
   scroll_box(width = "100%", height = "300px")# summary statistics
-
+```  
+  
+```{r, datacheck5, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
 # Specialized the insignificant value according to the significant level
 p.mat <- cor.mtest(cor_matrix)$p
 
 # visualize the correlation matrix
-corrplot(cor_matrix, method="color", type="upper",  tl.cex = 0.6, p.mat = p.mat, sig.level = 0.01, title="Correlations of the Boston data set", mar=c(0,0,1,0))
-
-# correlations / colour shows the correlation value/ also the size indicates the correlation
-```
+# correlations / colour shows the correlation values
+corrplot(cor_matrix, method="circle", type="upper",  tl.cex = 0.6, p.mat = p.mat, sig.level = 0.01, title="Correlations of the Boston data set", mar=c(0,0,1,0))  
+```  
   
-Insignificant values are shown with a cross in the square.  
-
+Insignificant values are shown with a cross in the square. The crime rate shows rather strong positive correlation with accessibility to highways, the property-tax rate and with the lower population status.
+  
 ***
+  
+## 1.3. Data set analysis
 
-## 1.3. Data set organisation
-
-### 1.3.1. Data standardization (scaling of the data set)
+## 1.3.1. Data standardization (scaling of the data set)
 
 Here we standardize the data set and print out summaries of the scaled data set.
-
-What is the scaling? Why is it done? Data transformation to make the values compareable.
-Log transformation for example changes the shape of the data distribution
-The target is that the mean of the values goes to 0 and the standarddeviation goes to 1.
+The data scaling is a method to standardize the values (some kind of transformation), so that we can compare the observations of the different variables. That creates negative and positive values with an overall mean of 0 and a standard deviation of 1.
 
 ```{r, datascale, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
 
@@ -105,27 +125,18 @@ boston_scaled <- scale(Boston)
 
 # summaries of the scaled variables
 knitr::kable(summary(boston_scaled), caption="Scaled Boston data set") %>% 
-  kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center")  %>% 
+  kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center", font_size = 11)  %>% 
   scroll_box(width = "100%", height = "300px")
-
-# class of the boston_scaled object
-class(boston_scaled)
 
 # change the object to data frame
 boston_scaled <- as.data.frame(boston_scaled)
 
 knitr::kable(boston_scaled, caption="Scaled Boston data set") %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") %>% scroll_box(width = "100%", height = "300px")
-
-
-scaled_ov <- ggpairs(boston_scaled, mapping = aes(), title ="Overview of the Boston data set", 
-                     lower = list(combo = wrap("facethist", bins = 20)), 
-                     upper = list(continuous = wrap("cor", size = 2.8)))
-scaled_ov
 ```
-
+  
 ***
 
-### 1.3.1. Create a categorical variable (crime rate)
+## 1.3.2. Create a categorical variable (crime rate)
 
 ```{r, datadeal1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
 # summary of the scaled crime rate
@@ -133,39 +144,98 @@ summary(boston_scaled$crim)
 
 # create a quantile vector of crim and print it
 bins <- quantile(boston_scaled$crim)
-knitr::kable(bins, caption="Quantiles of crim") %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "left")
+knitr::kable(bins, caption="Quantiles of crim") %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center")
 
 # create a categorical variable 'crime'
 crime <- cut(boston_scaled$crim, breaks = bins, include.lowest = TRUE, labels = c("low", "med_low", "med_high", "high"))
 
 # look at the table of the new factor crime
-knitr::kable(table(crime), caption="Categorical variables of crime") %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "left")
+knitr::kable(table(crime), caption="Categorical variables of crime") %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center")
 
 # remove original crim from the dataset
 boston_scaled <- dplyr::select(boston_scaled, -crim)
 
 # add the new categorical value to scaled data
 boston_scaled <- data.frame(boston_scaled, crime)
-```
 
+knitr::kable(head(boston_scaled), caption = "Scaled Boston data set") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center",) %>% 
+  scroll_box(width = "100%", height = "100%") # the data frame head
+```
+  
+  
+We checked the scaled crime rate values and defined the quantiles of the crime data, which where then named as low (0-25%), medium low (25-50%), medium high(50-75%) and high (75-100%).Then the cr
 
 Quantiles
 25% 75% of the data distribution
 quantiles give the values how many values are in which part of the data distribution
 median - the center of the quantiles (were the upper and lower 50 % quantiles meet)
+  
+***
+  
+## 1.3.3. Define training and test data set
+  
+```{r, train&test, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}     
+# number of rows in the Boston dataset 
+n_boston <- nrow(boston_scaled)
 
+# choose randomly 80% of the rows
+ind_boston <- sample(n_boston,  size = n_boston * 0.8)
 
+# create train set (crime variable stays in the data set)
+boston_train <- boston_scaled[ind_boston,]
+
+# create test set 
+boston_test <- boston_scaled[-ind_boston,]
+
+knitr::kable(head(boston_test), caption = "Test data set with Crime variable") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center",) %>% 
+  scroll_box(width = "100%", height = "100%") # the data frame head
+
+# save the correct classes from test data
+correct_classes <- boston_test$crime
+correct_classes
+
+# remove the crime variable from test data set / so the prediction can be done later!
+boston_test <- dplyr::select(boston_test, -crime)
+knitr::kable(head(boston_test), caption = "Test data without Crime variable") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center",) %>% 
+  scroll_box(width = "100%", height = "100%") # the data frame head
+```
+  
 ***
 
+## 1.3.4. Linear discriminant analysis of the training data set
 
-     
-     
-     
+```{r, LDAtraining, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}      
+# linear discriminant analysis
+lda.fit <- lda(crime ~ ., data = boston_train)
+
+# print the lda.fit object
+lda.fit
+
+# the function for lda biplot arrows
+lda.arrows <- function(x, myscale = 1, arrow_heads = 0.1, color = "red", tex = 0.75, choices = c(1,2)){
+  heads <- coef(x)
+  arrows(x0 = 0, y0 = 0, 
+         x1 = myscale * heads[,choices[1]], 
+         y1 = myscale * heads[,choices[2]], col=color, length = arrow_heads)
+  text(myscale * heads[,choices], labels = row.names(heads), 
+       cex = tex, col=color, pos=3)
+}
+
+# target classes as numeric
+classes <- as.numeric(boston_train$crime)
+
+# plot the lda results
+plot(lda.fit, dimen = 2, col = classes, pch = classes, main = "LDA biplot of Boston training data")
+lda.arrows(lda.fit, myscale = 2)
+```
+  
 linear discriminant analysis
 what does it do? Used for classification (some bo)
-  creates variable which characterize which variable discriminate most of the variables   
-     
 
+creates variable which characterize which variable discriminate most of the variables   
 
 classification --> you have the classes for the training data available
 e.g. logistic regression is a classification (0 or 1) - but just 2 groups
@@ -176,5 +246,107 @@ it's a descriptive method
 
 trajectory analysis is clustering for example (data dependent)
 
-propensity scores is another method for classification
+propensity scores is another method for classification  
+
+***
+  
+## 1.3.5. Prediction of crime classes on the test data set
+
+```{r, LDAprediction, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}      
+# predict classes with test data
+lda.pred <- predict(lda.fit, newdata = boston_test)
+lda.pred$class
+
+# cross tabulate the results
+pred_table <- table(correct = correct_classes, predicted = lda.pred$class)
+
+knitr::kable(pred_table, align = "c",  caption="Pediction of test data" ) %>% kable_styling(bootstrap_options = "striped", full_width = F, position = "center") %>% add_header_above(c(" " = 1, "Predicted crime rate" = 4)) %>%  pack_rows("Correct rate", 1, 4)
+```
+  
+It seems that the prediction is quite good with the LDA. 
+
+***
+
+## 1.3.5. Reload and standardize the Boston dataset and calculate the distances
+
+```{r, distances1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
+#load boston_scaled data set
+data(Boston) # load the Boston data set
+
+# scale the Boston data set again - named boston_scaled2
+boston_scaled2 <- scale(Boston)
+head(boston_scaled2)
+
+# euclidean distance matrix
+dist_eu <- dist(boston_scaled2)
+
+# look at the summary of the distances
+summary(dist_eu)
+
+# manhattan distance matrix
+dist_man <- dist(boston_scaled2, method = "manhattan")
+
+# look at the summary of the distances
+summary(dist_man)
+
+# k-means clustering
+km <-kmeans(boston_scaled2, centers = 3)
+
+# plot the Boston dataset with clusters
+pairs(boston_scaled2, col = km$cluster)
+
+
+```
+  
+## 1.3.5. Determine the k
+
+```{r, distances2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
+
+set.seed(123)
+
+# determine the number of clusters
+k_max <- 10
+
+# calculate the total within sum of squares
+twcss <- sapply(1:k_max, function(k){kmeans(boston_scaled2, k)$tot.withinss})
+
+# visualize the results
+qplot(x = 1:k_max, y = twcss, geom = 'line')
+
+# k-means clustering
+km <-kmeans(boston_scaled2, centers = 2)
+
+# plot the Boston dataset with clusters
+pairs(boston_scaled2, col = km$cluster)
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
 

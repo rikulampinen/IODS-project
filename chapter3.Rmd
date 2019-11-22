@@ -85,7 +85,7 @@ I have choosen these four variables for the data analyses for following reasons:
 
 The task is to explore the distribution of the variables I have choosen and the relationship with alcohol consumption numerically and graphically.  
 
-```{r, loadpackage, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+```{r, loadpackage, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
 library(tidyr)
 library(dplyr)
 library(ggplot2)
@@ -96,7 +96,7 @@ library(kableExtra)
 First I check how many female and male students are there:  
   
   
-```{r, exploredata1,  echo=FALSE, results='markdown', message=FALSE, warning=FALSE}
+```{r, exploredata1,  echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
 # check the number of female and male students
 alc %>% group_by(sex) %>% summarise(count = n()) -> fm
 knitr::kable(fm, caption="Students") %>% kable_styling(bootstrap_options = "hover", full_width = FALSE, position = "center")
