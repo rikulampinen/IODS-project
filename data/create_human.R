@@ -61,10 +61,10 @@ head(ge_inequ)
 
 # Use country as an identifier. Keep only countries from both datasets
 
-# Join the two data sets
+# Join the two data sets into the new data set "human"
 human <- inner_join(hu_dvlpmt, ge_inequ, by = "country",)
 
-# check the new data set "hu_ge"
+# check the new data set "human"
 dim(human)
 str(human)
 glimpse(human)
