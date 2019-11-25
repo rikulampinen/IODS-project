@@ -70,7 +70,7 @@ ov_boston <- ggpairs(Boston, mapping = aes(), title ="Overview of the Boston dat
 <center>  
 ![](C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/OV_plot_Boston.png)
 </center> 
-
+  
 ```{r, datacheck3, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
 # overview plot of interesting data
 bos_detail <- Boston[,c("crim","dis","tax","medv")]
@@ -78,8 +78,8 @@ bos_detail <- Boston[,c("crim","dis","tax","medv")]
 ov_bos_detail <- ggpairs(bos_detail, mapping = aes(),lower = list(combo = wrap("facethist", bins = 20)), 
                      upper = list(continuous = wrap("cor", size = 5)))
 ov_bos_detail
-```
-
+```  
+  
 The overview plot of the interesting data (for me) gives following information and the histograms give following information:
 the crime rate has the highest distribution on the low crime rate level. There might be some relationship with the distance to employment center. The tax rate has a high count on a lower level, decreases with a higher tax and has again a higher count on high taxes. The median value of the owner-occupied homes has a maximum count around 20000$. Tax and crime rate show a correlation of 50%.
   
@@ -98,6 +98,7 @@ knitr::kable(cor_matrix, caption="Correlation matrix values") %>%
   scroll_box(width = "100%", height = "300px")# summary statistics
 ```  
   
+    
 ```{r, datacheck5, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
 # Specialized the insignificant value according to the significant level
 p.mat <- cor.mtest(cor_matrix)$p
@@ -124,14 +125,14 @@ The data scaling is a method to standardize the values (some kind of transformat
 boston_scaled <- scale(Boston)
 
 # summaries of the scaled variables
-knitr::kable(summary(boston_scaled), caption="Scaled Boston data set") %>% 
+knitr::kable(summary(boston_scaled), caption="Summary of scaled Boston data set") %>% 
   kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center", font_size = 11)  %>% 
   scroll_box(width = "100%", height = "300px")
 
 # change the object to data frame
 boston_scaled <- as.data.frame(boston_scaled)
 
-knitr::kable(boston_scaled, caption="Scaled Boston data set") %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") %>% scroll_box(width = "100%", height = "300px")
+knitr::kable(boston_scaled, caption="Values of scaled Boston data set") %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") %>% scroll_box(width = "100%", height = "300px")
 ```
   
 ***
@@ -158,23 +159,25 @@ boston_scaled <- dplyr::select(boston_scaled, -crim)
 # add the new categorical value to scaled data
 boston_scaled <- data.frame(boston_scaled, crime)
 
-knitr::kable(head(boston_scaled), caption = "Scaled Boston data set") %>% 
+knitr::kable(boston_scaled, caption = "Scaled Boston data set with caterogical variable crime") %>% 
   kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center",) %>% 
-  scroll_box(width = "100%", height = "100%") # the data frame head
-```
+  scroll_box(width = "100%", height = "300px") # the data frame head
+```  
   
   
-We checked the scaled crime rate values and defined the quantiles of the crime data, which where then named as low (0-25%), medium low (25-50%), medium high(50-75%) and high (75-100%).Then the cr
+We checked the scaled crime rate values and defined the quantiles of the crime data, which where then named as low (0-25%), medium low (25-50%), medium high(50-75%) and high (75-100%).Then the crime rate quantiles definintions were added instead of the crim values as "crime" variable into the 'boston_scaled' data set.
 
-Quantiles
-25% 75% of the data distribution
-quantiles give the values how many values are in which part of the data distribution
-median - the center of the quantiles (were the upper and lower 50 % quantiles meet)
+Quantiles:  
+0% - 25% -50% - 75% -100% of the data distribution --> quantiles give the values how many values are in which part of the data distribution. The median is the center of the quantiles (were the upper and lower 50 % quantiles meet).  
   
 ***
   
 ## 1.3.3. Define training and test data set
   
+We are going to use 80% of the observations (the rows) to train the linear discriminant analysis model.  
+Therefore we prepare a training data set 'boston_train' including 80% of the rows and including the "crime" variable.  
+The test data set 'boston_test' will include 20% of the rows and we remove the "crime" variable. With the linear discriminant model we later on predict the crime rate of the test data set.  
+
 ```{r, train&test, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}     
 # number of rows in the Boston dataset 
 n_boston <- nrow(boston_scaled)
@@ -188,9 +191,9 @@ boston_train <- boston_scaled[ind_boston,]
 # create test set 
 boston_test <- boston_scaled[-ind_boston,]
 
-knitr::kable(head(boston_test), caption = "Test data set with Crime variable") %>% 
+knitr::kable(boston_test, caption = "Test data set with the crime variable") %>% 
   kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center",) %>% 
-  scroll_box(width = "100%", height = "100%") # the data frame head
+  scroll_box(width = "100%", height = "300px") # the data frame head
 
 # save the correct classes from test data
 correct_classes <- boston_test$crime
@@ -198,14 +201,16 @@ correct_classes
 
 # remove the crime variable from test data set / so the prediction can be done later!
 boston_test <- dplyr::select(boston_test, -crime)
-knitr::kable(head(boston_test), caption = "Test data without Crime variable") %>% 
+knitr::kable(boston_test, caption = "Test data without the crime variable") %>% 
   kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center",) %>% 
-  scroll_box(width = "100%", height = "100%") # the data frame head
-```
+  scroll_box(width = "100%", height = "300px") # the data frame head
+```  
   
 ***
 
 ## 1.3.4. Linear discriminant analysis of the training data set
+
+Here we run now the LDA ananlysis on the 'boston_train' data set. So we make a classification of the "crime" variable of our training data set.
 
 ```{r, LDAtraining, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}      
 # linear discriminant analysis
@@ -230,24 +235,12 @@ classes <- as.numeric(boston_train$crime)
 # plot the lda results
 plot(lda.fit, dimen = 2, col = classes, pch = classes, main = "LDA biplot of Boston training data")
 lda.arrows(lda.fit, myscale = 2)
-```
+```  
   
-linear discriminant analysis
-what does it do? Used for classification (some bo)
-
-creates variable which characterize which variable discriminate most of the variables   
-
-classification --> you have the classes for the training data available
-e.g. logistic regression is a classification (0 or 1) - but just 2 groups
-
-clustering --> you have training data which produces the clusters and these clusters can then be used for new data
-(data driven)
-it's a descriptive method
-
-trajectory analysis is clustering for example (data dependent)
-
-propensity scores is another method for classification  
-
+The linear discriminant analysis shows the classification of the "crime" variable. In the LDA plot we can see the separation of the different crime rates.  
+The LDA creates a value which characterize which variable discriminate most of the variables.
+So now we have performed the LDA on the training data set. Now we use the LDA outcome to perform a prediction on the crime rate on the testing data set.
+  
 ***
   
 ## 1.3.5. Prediction of crime classes on the test data set
@@ -263,11 +256,17 @@ pred_table <- table(correct = correct_classes, predicted = lda.pred$class)
 knitr::kable(pred_table, align = "c",  caption="Pediction of test data" ) %>% kable_styling(bootstrap_options = "striped", full_width = F, position = "center") %>% add_header_above(c(" " = 1, "Predicted crime rate" = 4)) %>%  pack_rows("Correct rate", 1, 4)
 ```
   
-It seems that the prediction is quite good with the LDA. 
+It seems that the prediction is maybe not the best using the linear descriminant analysis.    
+The prediction showed not so good results on the lower crime rate predictions. Results show that the crime rate was predicted higher than it actually is (shows in predicted med_low of 9 and med_high which are actually low rates). In the medium crime level it also wrongly predicted quite a number of values, but on the high crime rates the predictions is quite good with just on value wrongly predicted.
 
 ***
 
 ## 1.3.5. Reload and standardize the Boston dataset and calculate the distances
+  
+Now we are going to perform a data clustering. This is different from classifications because in classifications the classes are defined before (in our case the different crime rate values from low to high). Here we analyise the data and through this analysis the clustering will show us were the data is different.  
+
+So here we are going to reload the orgininal 'Boston' data set and scale the data again to a new data frame 'boston_scaled2'. Then we calculate the euclidian distances between the obsvervations. Then the k-means are calculated and
+
 
 ```{r, distances1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
 #load boston_scaled data set
@@ -275,7 +274,9 @@ data(Boston) # load the Boston data set
 
 # scale the Boston data set again - named boston_scaled2
 boston_scaled2 <- scale(Boston)
-head(boston_scaled2)
+knitr::kable(head(boston_scaled2), caption = "Scaled Boston data set" ) %>% 
+              kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center",) %>% 
+              scroll_box(width = "100%", height = "300px") # the data frame head
 
 # euclidean distance matrix
 dist_eu <- dist(boston_scaled2)
@@ -290,19 +291,24 @@ dist_man <- dist(boston_scaled2, method = "manhattan")
 summary(dist_man)
 
 # k-means clustering
-km <-kmeans(boston_scaled2, centers = 3)
+km_boston <- kmeans(boston_scaled2, centers = 3)
 
 # plot the Boston dataset with clusters
-pairs(boston_scaled2, col = km$cluster)
-
-
-```
+pairs(boston_scaled2, col = km_boston$cluster)
+pairs(boston_scaled2[,1:5], col = km_boston$cluster)
+pairs(boston_scaled2[,6:10], col = km_boston$cluster)
+pairs(boston_scaled2[,11:14], col = km_boston$cluster)
+```  
   
+I have performed the k-means clustering with several cluster numbers and think that 3 clusters are the number which allows to get the best overview over the data.  The clustering worked good on crim variable, on the nitrogen oxides concentrations and also age, tax and the medv variable.
+Next we are checking were the k values are decreasing in a plot showing 10 clusters with the total within sum of squares (twcss). On the cluster level where this number decreases heavily that amount of clusters gives a good data overview. 
+
 ## 1.3.5. Determine the k
 
-```{r, distances2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
+```{r, kdetermination, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
 
 set.seed(123)
+
 
 # determine the number of clusters
 k_max <- 10
@@ -314,33 +320,94 @@ twcss <- sapply(1:k_max, function(k){kmeans(boston_scaled2, k)$tot.withinss})
 qplot(x = 1:k_max, y = twcss, geom = 'line')
 
 # k-means clustering
-km <-kmeans(boston_scaled2, centers = 2)
+km_boston <- kmeans(boston_scaled2, centers = 3)
 
 # plot the Boston dataset with clusters
-pairs(boston_scaled2, col = km$cluster)
+pairs(boston_scaled2, col = km_boston$cluster)
+```
 
+The twcss value decrease at a level of 2 - 3 clusters heavily. So the data I think is optimally clustered with three clusters, seen in the overview plot.
+ 
+  
+## 1.3.6. Bonus
 
+* Perform the LDA using the clusters as target.  
+* Include all the variables in the Boston data in the LDA model.  
+* Visualize the results with a biplot (include arrows representing the relationships of the original variables to the  LDA solution)
+
+```{r, bonus, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
+
+data(Boston) # load the Boston data set
+
+# scale the Boston data set again - named boston_scaled2
+boston_scaled3 <- scale(Boston)
+
+# k-means clustering
+km_boston <-kmeans(boston_scaled3, centers = 3)
+cluster <- km_boston$cluster
+
+# add the cluster number to the dataframe
+boston_scaled3 <- data.frame(boston_scaled3, cluster)
+
+# linear discriminant analysis of clusters vs. all other variables
+lda.fit_cluster <- lda(cluster ~ ., data = boston_scaled3)
+
+# print the lda.fit object
+lda.fit_cluster
+
+# the function for lda biplot arrows
+lda.arrows <- function(x, myscale = 1, arrow_heads = 0.1, color = "red", tex = 0.75, choices = c(1,2)){
+  heads <- coef(x)
+  arrows(x0 = 0, y0 = 0, 
+         x1 = myscale * heads[,choices[1]], 
+         y1 = myscale * heads[,choices[2]], col=color, length = arrow_heads)
+  text(myscale * heads[,choices], labels = row.names(heads), 
+       cex = tex, col=color, pos=3)
+}
+
+# target classes as numeric
+classes3 <- as.numeric(boston_scaled3$cluster)
+```
+
+```{r, bonusplot, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
+# plot the lda results
+
+plot(lda.fit_cluster, dimen = 2, col = classes3, pch = classes3, main = "LDA biplot using three clusters 1, 2 and 3")
+lda.arrows(lda.fit_cluster, myscale = 2)
+
+```
+  
+So I scaled the Boston data set. Defined the k-means 'km_boston' clusters and added the cluster number to the scaled data frame. Then I ran the LDA model with the clusters against all other variables and added the arrows.   
+In the LDA biplot you can see how nicely the clusters are separated from each other - so the clustering actually worked.
+The most influencial linear separators seem to be "age", "zn" (lands over2500 sq.ft.), "nox" (nitrogen oxide concentration) and "tax" (full-value property-tax rate).  
+  
+## 1.3.7. Super-Bonus
+
+```{r, superbonus, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
+#run the code for the scaled training data set
+model_predictors <- dplyr::select(boston_train, -crime)
+
+# check the dimensions
+dim(model_predictors)
+dim(lda.fit$scaling)
+
+# matrix multiplication
+matrix_product <- as.matrix(model_predictors) %*% lda.fit$scaling
+matrix_product <- as.data.frame(matrix_product)
+
+# installed plotly package and load it
+library(plotly)
+
+crimeplot <- plot_ly(x = matrix_product$LD1, y = matrix_product$LD2, z = matrix_product$LD3, type= 'scatter3d', mode='markers', color = boston_train$crime)
+crimeplot
+
+clusterplot <- plot_ly(x = matrix_product$LD1, y = matrix_product$LD2, z = matrix_product$LD3, type= 'scatter3d', mode='markers',color = classes3)
 
 
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  
+The 3D plot of the crime training data set is visible here.
+The cluster plot does not work... I don't know why...
 
 
 
