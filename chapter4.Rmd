@@ -257,7 +257,7 @@ knitr::kable(pred_table, align = "c",  caption="Pediction of test data" ) %>% ka
 ```
   
 It seems that the prediction is maybe not the best using the linear descriminant analysis.    
-The prediction showed not so good results on the lower crime rate predictions. Results show that the crime rate was predicted higher than it actually is (shows in predicted med_low of 9 and med_high which are actually low rates). In the medium crime level it also wrongly predicted quite a number of values, but on the high crime rates the predictions is quite good with just on value wrongly predicted.
+The prediction showed not so good results on the lower crime rate predictions. Results show that the crime rate was predicted higher than it actually is (see in predicted med_low of and med_high which are actually low rates or med_low rates). In the medium crime level it also wrongly predicted quite a number of values, but on the high crime rates the predictions is quite good with just on value wrongly predicted.
 
 ***
 
