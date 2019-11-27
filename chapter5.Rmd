@@ -1,0 +1,229 @@
+# Chapter 5: Dimensionality reduction techniques
+
+### Data wrangling and performing principal component analysis (PCA) & multiple correspondence analysis (MCA) 
+
+#### *Work of week 48 (25.11. - 01.12.2019)*
+
+***
+
+## 1. Analysis of human data set
+
+The data wrangling was done in two steps:  a data frame combination of two data sets and as a second step a refining the data to those variables we want to analyse. The data wrangling scrip was uploaded to my GitHub repository.    
+You can find the data wrangling script [here](https://github.com/rikulampinen/IODS-project/blob/master/data/create_human.R).  
+
+
+## 1.1. Load the data set
+
+```{r, packages, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+# load necessary packages
+library(tidyr)
+library(dplyr)
+library(corrplot)
+library(ggplot2)
+library(GGally)
+library(knitr)
+library(kableExtra)
+library(stringr)
+library(ggfortify)
+```
+
+```{r, loaddata, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+# load the data set "human"
+human <- read.table(file = 
+             "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/human_analys.txt")
+```
+  
+*** 
+  
+## 1.2. The data set (overview and correlations)
+
+```{r, checkdata1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+# check the data set "human"
+str(human)
+
+#  data set table
+knitr::kable(human) %>% 
+  kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") %>% 
+  scroll_box(width = "100%", height = "300px")
+
+# data summary
+knitr::kable(summary(human)) %>% 
+  kable_styling(bootstrap_options = "striped", position = "center", font_size = 11)
+```
+  
+The "human" data set consists of 8 variables with 155 observations. The data set includes following variables:
+
+* *"country"*         --> country name  
+* *"ratio.sec.edu"*   --> ratio of second education of female/male  
+* *"ratio.lab.force"* --> ratio of labour forced female/male  
+* *"edu.expect"*      --> expected years of schooling  
+* *"life.exp"*        --> life expectancy at birth  
+* *"GNI"*             --> Gross National Income per capita  
+* *"mat.mor.r"*       --> maternal mortality ratio  
+* *"adol.birth"*      --> adolescent birth rate  
+* *"rep.parliament"*  --> percetange of female representatives in parliament  
+
+The data was collected from the United Nations. More information about the data and how it was collected can be found [here](http://hdr.undp.org/en/content/human-development-index-hdi).
+Technical notes about calculating the human development indices can be found [here](http://hdr.undp.org/sites/default/files/hdr2015_technical_notes.pdf).  
+
+***
+  
+```{r, checkdata2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
+# visualization of human data set
+
+ov_human <- ggpairs(human, mapping = aes(), title ="Overview of the 'human' data set", 
+                     lower = list(combo = wrap("facethist", bins = 20)), 
+                     upper = list(continuous = wrap("cor", size = 3)))
+ov_human
+```
+  
+The overview plot shows the data distributions of all variables in the data set and its correlations to each other.
+
+
+
+```{r, datacorr, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
+# calculate the correlation matrix and round it
+cor_human <- cor(human) %>% round(digits = 4)
+
+cor_human %>% knitr::kable(caption = "Correlation table of human data set") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center")
+
+# Specialized the insignificant value according to the significant level
+p.mat <- cor.mtest(cor_human)$p
+
+# visualize the correlation matrix
+# correlations / colour shows the correlation values
+corrplot(cor_human, method="pie", type="lower",  tl.cex = 0.65, p.mat = p.mat, sig.level = 0.01, tl.srt = 45, title="Correlations of the 'human' data set", mar=c(0,0,1,0))  
+```
+  
+This correlation plot shows nicely which variable corrate positively or negatively to each other.
+The crossed square show a correlation which is not significant (p-value > 0.01).
+
+***
+
+## 1.3. Data Analysis
+
+## 1.3.1. Principal component analysis (PCA) on the **not** standardized 'human' data set 
+  
+Generally: in a PCA the data is transformed into new features called the principal components. The first principal component (PC) captures the maximum amount of variance of the features in the original data. The second PC captures the maximum amount of variability left and is orthogonal to the first PC (in a right angle to the first PC). All PC are uncorrelated. We are using PC1 and PC2 for our data interpretation.
+
+
+```{r, not_std_PCA1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
+# perform PCA on not standardized data set
+pca_human <- prcomp(human)
+
+# Principal components 1 & 2 table
+round(pca_human$rotation[, 1:2], digits = 6) %>% knitr::kable() %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center")
+
+# label of the PC 
+s1 <- summary(pca_human)
+pca_prc1 <- round(100 * s1$importance[2, ], digits = 3) 
+pca_label1 <- paste0(names(pca_prc1)," (",pca_prc1,"%) ")
+
+#draw a biplot of the principal component representation and the original variables
+biplot(pca_human, choices = 1:2, cex = c(0.6, 1), col = c("grey40", "darkgreen"), xlab = pca_label1[1], ylab = pca_label1[2], main = "PCA biplot of non standardized 'human' data set", margin =c(0,0,5,0))
+```
+  
+**Another kind of biplot**
+```{r, not_std_PCA2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
+# more advanced biplot
+autoplot(prcomp(human), data = human, colour = "darkgreen", loadings = TRUE, loadings.label = TRUE, loadings.colour = "red") + ggtitle("PCA biplot of not standardized 'human' data set")
+```
+  
+Principal component 1 represents 99.99% of the variance of the data set. PC2 captures just 0.01% of the variance.
+
+
+
+
+## 1.3.2. Principal component analysis (PCA) on the **standardized** 'human' data set 
+
+```{r, stdzd_human, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
+# scaling of human data set
+human_stzd <- scale(human)
+
+# summary of standardized human data set
+knitr::kable(summary(human_stzd)) %>% 
+  kable_styling(bootstrap_options = "striped", position = "center", font_size = 11)
+```
+  
+In the summary table you can see that all mean values are 0. So the scaling of the 'human' data set was successful.  
+Now the PCA of this standardized data follows.
+
+```{r, stdzd_human_PCA1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
+# perform PCA on standardized data set
+pca_human_stzd <- prcomp(human_stzd)
+
+# Principal components 1 & 2 table
+round(pca_human_stzd$rotation[, 1:2], digits = 6) %>% knitr::kable(caption = "PC1 & 2 of standardized 'human' data") %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center")
+
+# PC label
+s2 <- summary(pca_human_stzd)
+pca_prc2 <- round(100 * s2$importance[2, ], digits = 1) 
+pca_label2 <- paste0(names(pca_prc2)," (",pca_prc2,"%) ")
+
+# draw the PCA biplot
+biplot(pca_human_stzd, choices = 1:2, cex = c(0.6, 1), col = c("grey40", "deeppink2"), xlab = pca_label2[1], ylab = pca_label2[2], main = "PCA biplot of standardized 'human' data set", margin =c(0,0,5,0))
+```
+
+
+**Again, another kind of biplot**
+```{r, stdzd_human_PCA2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
+# more advanced biplot
+autoplot(prcomp(human_stzd), data = human, colour = "darkgreen", loadings = TRUE, loadings.label = TRUE, loadings.colour = "deeppink",) + annotate("text", x = 0.2, y = 0.2, label = "test") + ggtitle("PCA biplot of standardized 'human' data set") 
+```
+
+Are the results different? 
+
+Why or why not? 
+
+Include captions (brief descriptions) in your plots where you describe the results by using not just your variable names, but the actual phenomenons they relate to.
+
+
+
+The angle between the arrows represents the original features of the data set and we can interpret it as the correlation between these features.  
+Is the angle between the arrows small, then there is a positive correlation
+Also the angle between the feature and the principal component can be interpreted as the correlation between these two components.  
+Again, if the angle is small there is a positive correlation.  
+The length of the arrows is proportianl to the standard deviation of the features.
+
+
+
+**Give your personal interpretations**  
+of the first two principal component dimensions based on the biplot drawn after PCA on the standardized human data. 
+
+
+
+
+```{r, factominer, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
+
+library(FactoMineR)
+data(tea)
+
+str(tea)
+dim(tea)
+
+# column names to keep in the dataset
+keep_tea <- c("Tea", "How", "how", "sugar", "where", "lunch")
+
+# select the 'keep_columns' to create a new dataset
+tea_time <- select(tea, one_of(keep_tea))
+
+gather(tea_time) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_bar(fill = "darkgreen") + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
+
+
+# multiple correspondence analysis
+mca_tea <- MCA(tea_time, graph = FALSE)
+
+# summary of the model
+summary(mca_tea)
+
+# visualize MCA
+plot(mca_tea, invisible=c("ind"), habillage = "quali")
+
+
+
+
+
+
+
+```
