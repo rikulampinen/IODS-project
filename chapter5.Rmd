@@ -25,6 +25,7 @@ library(knitr)
 library(kableExtra)
 library(stringr)
 library(ggfortify)
+library(factoextra)
 ```
 
 ```{r, loaddata, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
@@ -169,14 +170,25 @@ biplot(pca_human_stzd, choices = 1:2, cex = c(0.6, 1), col = c("grey40", "deeppi
 **Again, another kind of biplot**
 ```{r, stdzd_human_PCA2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
 # more advanced biplot
-autoplot(prcomp(human_stzd), data = human, colour = "darkgreen", loadings = TRUE, loadings.label = TRUE, loadings.colour = "deeppink",) + annotate("text", x = 0.2, y = 0.2, label = "test") + ggtitle("PCA biplot of standardized 'human' data set") 
+autoplot(prcomp(human_stzd), data = human, colour = "darkgreen", loadings = TRUE, loadings.label = TRUE, loadings.colour = "deeppink",) + ggtitle("PCA biplot of standardized 'human' data set") 
 ```
 
+PC2 is strongly associated with parliament representatives and the labour force ratio
+
+
+--> check loading matrix of the PCA
+
+
 Are the results different? 
+
+
+
 
 Why or why not? 
 
 Include captions (brief descriptions) in your plots where you describe the results by using not just your variable names, but the actual phenomenons they relate to.
+
+What to do?
 
 
 
@@ -221,6 +233,9 @@ summary(mca_tea)
 plot(mca_tea, invisible=c("ind"), habillage = "quali")
 
 
+
+
+fviz_mca_biplot(mca_tea)
 
 
 
