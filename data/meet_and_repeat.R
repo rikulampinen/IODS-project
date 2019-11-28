@@ -107,3 +107,5 @@ write.table(rats_l, file = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-cour
 read.table("C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/bprs_l.txt") %>% str()
 
 read.table("C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/rats_l.txt") %>% str()
+
+
