@@ -8,10 +8,8 @@
 
 ## 1. Analysis of human data set
 
-The data wrangling was done in two steps:  a data frame combination of two data sets and as a second step a refining the data to those variables we want to analyse. The data wrangling scrip was uploaded to my GitHub repository.    
-You can find the data wrangling script [here](https://github.com/rikulampinen/IODS-project/blob/master/data/create_human.R).  
-
-
+The data wrangling was done in two steps:  a data frame combination of two data sets and as a second step a refining the data to those variables we want to analyse. The data wrangling scrip was uploaded to my GitHub repository. You can find the data wrangling script [here](https://github.com/rikulampinen/IODS-project/blob/master/data/create_human.R).   
+  
 ## 1.1. Load the data set
 
 ```{r, packages, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
@@ -38,6 +36,24 @@ human <- read.table(file =
   
 ## 1.2. The data set (overview and correlations)
 
+The original complete data set from the United Nations was wrangled and combined into the so called "human" data set.
+This human data set consists of 8 variables with 155 observations. The data set includes following variables:
+
+* *country*         --> Name of the country 
+* *ratio.sec.edu*   --> Ratio of second education of female/male  
+* *ratio.lab.force* --> Ratio of labour forced female/male  
+* *edu.expect*      --> Expected years of schooling  
+* *life.exp*        --> Life expectancy at birth 
+* *GNI*             --> Gross National Income per capita  
+* *mat.mor.r*       --> Maternal mortality ratio  
+* *adol.birth*      --> Adolescent birth rate  
+* *rep.parliament*  --> Percetange of female representatives in parliament  
+
+The data was collected from the United Nations. More information about the data and how it was collected can be found [here](http://hdr.undp.org/en/content/human-development-index-hdi).
+Technical notes about calculating the human development indices can be found [here](http://hdr.undp.org/sites/default/files/hdr2015_technical_notes.pdf).  
+   
+Here you see the structure, the complete table and the summary of the wrangled human data set.
+
 ```{r, checkdata1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
 # check the data set "human"
 str(human)
@@ -52,39 +68,23 @@ knitr::kable(summary(human)) %>%
   kable_styling(bootstrap_options = "striped", position = "center", font_size = 11)
 ```
   
-The "human" data set consists of 8 variables with 155 observations. The data set includes following variables:
-
-* *"country"*         --> country name  
-* *"ratio.sec.edu"*   --> ratio of second education of female/male  
-* *"ratio.lab.force"* --> ratio of labour forced female/male  
-* *"edu.expect"*      --> expected years of schooling  
-* *"life.exp"*        --> life expectancy at birth  
-* *"GNI"*             --> Gross National Income per capita  
-* *"mat.mor.r"*       --> maternal mortality ratio  
-* *"adol.birth"*      --> adolescent birth rate  
-* *"rep.parliament"*  --> percetange of female representatives in parliament  
-
-The data was collected from the United Nations. More information about the data and how it was collected can be found [here](http://hdr.undp.org/en/content/human-development-index-hdi).
-Technical notes about calculating the human development indices can be found [here](http://hdr.undp.org/sites/default/files/hdr2015_technical_notes.pdf).  
-
 ***
   
+### Graphical overview of the human data set  
+
 ```{r, checkdata2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
 # visualization of human data set
-
-ov_human <- ggpairs(human, mapping = aes(), title ="Overview of the 'human' data set", 
+ov_human <- ggpairs(human, mapping = aes(), title ="Overview of the human data set", 
                      lower = list(combo = wrap("facethist", bins = 20)), 
                      upper = list(continuous = wrap("cor", size = 3)))
 ov_human
 ```
   
-The overview plot shows the data distributions of all variables in the data set and its correlations to each other.
-
-
+The overview plot shows the data distributions of all variables in the data set and its correlations to each other. Most of the data is basically normally distributed. GNI, maternal mortality rate  and adolescence birth rate show left skewed distribution representing a increased cound on low rates. On the upper part the correlations of the variables are shown as number values. Following you see the correlation matrix and a correlation plot presenting the values graphically.  
 
 ```{r, datacorr, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
 # calculate the correlation matrix and round it
-cor_human <- cor(human) %>% round(digits = 4)
+cor_human <- cor(human) %>% round(digits = 2)
 
 cor_human %>% knitr::kable(caption = "Correlation table of human data set") %>% 
   kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center")
@@ -94,49 +94,59 @@ p.mat <- cor.mtest(cor_human)$p
 
 # visualize the correlation matrix
 # correlations / colour shows the correlation values
-corrplot(cor_human, method="pie", type="lower",  tl.cex = 0.65, p.mat = p.mat, sig.level = 0.01, tl.srt = 45, title="Correlations of the 'human' data set", mar=c(0,0,1,0))  
+corrplot(cor_human, method="pie", type="lower",  tl.cex = 0.65, p.mat = p.mat, sig.level = 0.01, tl.srt = 45, title="Correlations of the human data set", mar=c(0,0,1,0))  
 ```
   
 This correlation plot shows nicely which variable corrate positively or negatively to each other.
-The crossed square show a correlation which is not significant (p-value > 0.01).
-
+The crossed square show a correlation which is not significant (p-value > 0.01). Strong positive correlations are seen between live expectation and expected years of education, gross national income with expected years of education and live expectation and adolescent birth rate with maternal mortality. So a better education leads to a higher income and so a higher life expectation. Maternal mortality rate depends on the rate of adolescence birth rate.  
+  
 ***
-
+  
 ## 1.3. Data Analysis
 
-## 1.3.1. Principal component analysis (PCA) on the **not** standardized 'human' data set 
+## 1.3.1. Principal component analysis (PCA) on the **not** standardized human data set 
   
-Generally: in a PCA the data is transformed into new features called the principal components. The first principal component (PC) captures the maximum amount of variance of the features in the original data. The second PC captures the maximum amount of variability left and is orthogonal to the first PC (in a right angle to the first PC). All PC are uncorrelated. We are using PC1 and PC2 for our data interpretation.
+Generally: in a PCA the data is transformed into new features called the principal components. The first principal component (PC) captures the maximum amount of variance of the features in the original data. The second PC captures the maximum amount of variability left and is orthogonal to the first PC (in a right angle to the first PC). All PCAs are uncorrelated analysis methods. Here we are using PC1 and PC2 for the data interpretation. 
 
-
+Here the principal component analysis of the not standardized human data set, a table with the values of the principle components 1 & 2 and the PCA biplot.
+  
 ```{r, not_std_PCA1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
 # perform PCA on not standardized data set
 pca_human <- prcomp(human)
 
-# Principal components 1 & 2 table
-round(pca_human$rotation[, 1:2], digits = 6) %>% knitr::kable() %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center")
+# PCA results on PC1 and PC2 on all variables
+round(pca_human$rotation[,1:2], digits = 4) %>% knitr::kable(caption = "PCA result on all variables") %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center")
 
-# label of the PC 
+# summary of the pca
 s1 <- summary(pca_human)
-pca_prc1 <- round(100 * s1$importance[2, ], digits = 3) 
-pca_label1 <- paste0(names(pca_prc1)," (",pca_prc1,"%) ")
 
-#draw a biplot of the principal component representation and the original variables
-biplot(pca_human, choices = 1:2, cex = c(0.6, 1), col = c("grey40", "darkgreen"), xlab = pca_label1[1], ylab = pca_label1[2], main = "PCA biplot of non standardized 'human' data set", margin =c(0,0,5,0))
+# round the percentages of variance captured by the pc
+pca_prc1 <- round(100 * s1$importance[2, ], digits = 3) 
+
+# Principal components 1 & 2 table
+round(100 * s1$importance[2, 1:2], digits = 5) %>% knitr::kable(caption = "Principle components") %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center")
+
+# prepare a label for the biplot
+pca_label1 <-  paste0("GNI (", pca_prc1[1],"%)" )
+pca_label2 <-  paste0("Maternal mortality (", pca_prc1[2],"%)" )
+
+# draw the pca biplot
+biplot(pca_human, choices = 1:2, cex = c(0.55, 0,9), col = c("grey40", "darkgreen"), xlab = pca_label1, 
+                      ylab = pca_label2, main = "PCA biplot of non standardized human data set", margin =c(0,0,5,0)) 
+
 ```
   
-**Another kind of biplot**
+**Let's try another kind of biplot**
 ```{r, not_std_PCA2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
 # more advanced biplot
-autoplot(prcomp(human), data = human, colour = "darkgreen", loadings = TRUE, loadings.label = TRUE, loadings.colour = "red") + ggtitle("PCA biplot of not standardized 'human' data set")
+autoplot(pca_human, data = human, label= TRUE, label.size = 3.0, colour = "darkgreen", loadings = TRUE, loadings.label = TRUE, loadings.colour = "red",) + ggtitle("PCA biplot of not standardized human data set") + xlab(paste0(pca_label1))  + ylab(paste0(pca_label2)) + theme_bw()
 ```
   
-Principal component 1 represents 99.99% of the variance of the data set. PC2 captures just 0.01% of the variance.
-
-
-
-
-## 1.3.2. Principal component analysis (PCA) on the **standardized** 'human' data set 
+Principal component 1 represents 99.99% of the variance of the data set. PC2 captures just 0.01% of the variance. Pc1 is associated with the GNI variable. So, the Gross National Income per capita explains 99.99% of the principal component 1 of the data. 0.01 % is associated with maternal mortalility rate. This is the not standardized data set, that's why we get this result.
+  
+## 1.3.2. Principal component analysis (PCA) on the **standardized** human data set 
+  
+First we are scaling the data set so that the human is standardized so that the mean of all values is 0 and the standard diviation reaches 1. See here the summary table of the standardized data set.  
 
 ```{r, stdzd_human, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
 # scaling of human data set
@@ -147,7 +157,7 @@ knitr::kable(summary(human_stzd)) %>%
   kable_styling(bootstrap_options = "striped", position = "center", font_size = 11)
 ```
   
-In the summary table you can see that all mean values are 0. So the scaling of the 'human' data set was successful.  
+In the summary table you can see that all mean values are 0. So the scaling of the human data set was successful.  
 Now the PCA of this standardized data follows.
 
 ```{r, stdzd_human_PCA1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
@@ -155,57 +165,45 @@ Now the PCA of this standardized data follows.
 pca_human_stzd <- prcomp(human_stzd)
 
 # Principal components 1 & 2 table
-round(pca_human_stzd$rotation[, 1:2], digits = 6) %>% knitr::kable(caption = "PC1 & 2 of standardized 'human' data") %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center")
+round(pca_human_stzd$rotation[, 1:2], digits = 4) %>% knitr::kable(caption = "PC1 & 2 of standardized human data") %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center")
 
-# PC label
+# PC labels
 s2 <- summary(pca_human_stzd)
 pca_prc2 <- round(100 * s2$importance[2, ], digits = 1) 
-pca_label2 <- paste0(names(pca_prc2)," (",pca_prc2,"%) ")
+
+pca_label2.1 <- paste0("Education and health (",pca_prc2[1],"%) ")
+pca_label2.2 <- paste0("Female social participation (",pca_prc2[2],"%) ")
+
+# Principal components 1 & 2 table
+round(100 * s2$importance[2, 1:2], digits = 2) %>% knitr::kable(caption = "Principle components") %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center")
 
 # draw the PCA biplot
-biplot(pca_human_stzd, choices = 1:2, cex = c(0.6, 1), col = c("grey40", "deeppink2"), xlab = pca_label2[1], ylab = pca_label2[2], main = "PCA biplot of standardized 'human' data set", margin =c(0,0,5,0))
+biplot(pca_human_stzd, choices = 1:2, cex = c(0.5, 0,9), col = c("grey40", "deeppink2"), xlab = pca_label2.1, ylab = pca_label2.2, main = "PCA biplot of standardized human data set", margin =c(0,0,5,0))
 ```
 
 
-**Again, another kind of biplot**
+**Also here another kind of biplot**
 ```{r, stdzd_human_PCA2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
 # more advanced biplot
-autoplot(prcomp(human_stzd), data = human, colour = "darkgreen", loadings = TRUE, loadings.label = TRUE, loadings.colour = "deeppink",) + ggtitle("PCA biplot of standardized 'human' data set") 
+autoplot(prcomp(human_stzd), data = human, colour = "darkgreen", label= FALSE, label.size = 3.0, loadings = TRUE, loadings.label = TRUE, loadings.colour = "red",) + ggtitle("PCA biplot of standardized human data set") + xlab(paste0(pca_label2.1))  + ylab(paste0(pca_label2.2)) + theme_bw()
 ```
-
-PC2 is strongly associated with parliament representatives and the labour force ratio
-
-
---> check loading matrix of the PCA
-
-
-Are the results different? 
-
-
-
-
-Why or why not? 
-
-Include captions (brief descriptions) in your plots where you describe the results by using not just your variable names, but the actual phenomenons they relate to.
-
-What to do?
-
-
-
-The angle between the arrows represents the original features of the data set and we can interpret it as the correlation between these features.  
-Is the angle between the arrows small, then there is a positive correlation
-Also the angle between the feature and the principal component can be interpreted as the correlation between these two components.  
-Again, if the angle is small there is a positive correlation.  
-The length of the arrows is proportianl to the standard deviation of the features.
-
-
-
+  
+The principal component representing 16.2% of the data variation is strongly associated with parliament representatives and the labour force ratio (female / male). So the occurance of of woman in the labour market and in the political representation is mostly associated with principal component 2. 
+The variables which show the strongest association with principal component 1 (representing 53.6% of the data variation) are life expectation, the school period, the ratio of female/male of second education, adolenscence birthrate and maternal mortality. So overall principal component 1 represents the health and education situation of the countries.
+  
+The PCA results differ a lot! To perform the PCA we need to make sure that the obsvervations are standardized, which means that the values are transformed in compareable values.  
+We can see that in the PCA of the non-standardized human data set the principal component 1 represents almost all varation of the data set - so the Gross National Income per capita is the value representing principle component 1.  
+The PCA of standardized values looks quite different. You can see that the PC1 & PC2 values spread all over the biplot and more variables are associated to the two principal components.  
+  
+The angle between the arrows represents the original features of the data set and we can interpret it as the correlation between these features. Is the angle between the arrows small, then there is a positive correlation.  
+Also the angle between the feature and the principal component can be interpreted as the correlation between these two components. Again, if the angle is small there is a positive correlation. The length of the arrows is proportianl to the standard deviation of the features.  
+  
 **Give your personal interpretations**  
 of the first two principal component dimensions based on the biplot drawn after PCA on the standardized human data. 
-
-
-
-
+  
+  
+## 2. Multiple Correspondence Analysis (MCA) 
+  
 ```{r, factominer, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
 
 library(FactoMineR)
