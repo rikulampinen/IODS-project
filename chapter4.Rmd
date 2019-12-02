@@ -410,16 +410,6 @@ n_boston3 <- nrow(boston_scaled3)
 # choose randomly 80% of the rows
 ind_boston3 <- sample(n_boston3,  size = n_boston * 0.8)
 
-
-
-
-
-
-
-
-
-
-
 # kmeans clustering of boston_scaled3
 km_cluster <-  kmeans(boston_scaled3, centers = 3)
 boston_scaled3$cluster <- km_cluster$cluster
@@ -427,22 +417,8 @@ boston_scaled3$cluster <- km_cluster$cluster
 
 clustertrain <- boston_scaled3[ind_boston3,]
 
-
-
 clusterplot <- plot_ly(x = matrix_product$LD1, y = matrix_product$LD2, z = matrix_product$LD3, type= 'scatter3d', mode='markers', color = clustertrain)
 clusterplot
-
-
 ```
   
 The 3D plot of the crime training data set is visible here.
-The cluster plot does not work... I don't know why...
-
-
-
-
-
-
-    
-
-

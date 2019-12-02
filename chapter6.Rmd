@@ -96,7 +96,7 @@ ggplot(rats_l, aes(x = Time, y = Weight, linetype = ID)) +
   geom_line() +
   scale_linetype_manual(values = rep(1:16, times = 11)) + # needs to be checked!!!
   facet_grid(. ~ Group, labeller = label_both) +
-  theme(legend.position = "none") + 
+  theme(legend.position = "bottom") +
   scale_y_continuous(limits = c(min(rats_l$Weight), max(rats_l$Weight))) + 
   ggtitle("RATS - long data")
 ```
@@ -119,7 +119,7 @@ rats_l <- rats_l %>%
 # Glimpse the data
 glimpse(rats_l)
 
-# Plot again with the standardised bprs
+# Plot again with the standardised rats_l
 ggplot(rats_l, aes(x = Time, y = StdWeight, linetype = ID)) +
   geom_line() +
   scale_linetype_manual(values = rep(1:16, times=11)) +

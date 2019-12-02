@@ -70,7 +70,7 @@ knitr::kable(summary(human)) %>%
   
 ***
   
-### Graphical overview of the human data set  
+### 1.2.1. Graphical overview of the human data set  
 
 ```{r, checkdata2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
 # visualization of human data set
@@ -104,7 +104,7 @@ The crossed square show a correlation which is not significant (p-value > 0.01).
   
 ## 1.3. Data Analysis
 
-## 1.3.1. Principal component analysis (PCA) on the **not** standardized human data set 
+### 1.3.1. Principal component analysis (PCA) on the **not** standardized human data set 
   
 Generally: in a PCA the data is transformed into new features called the principal components. The first principal component (PC) captures the maximum amount of variance of the features in the original data. The second PC captures the maximum amount of variability left and is orthogonal to the first PC (in a right angle to the first PC). All PCAs are uncorrelated analysis methods. Here we are using PC1 and PC2 for the data interpretation. 
 
@@ -143,8 +143,10 @@ autoplot(pca_human, data = human, label= TRUE, label.size = 3.0, colour = "darkg
 ```
   
 Principal component 1 represents 99.99% of the variance of the data set. PC2 captures just 0.01% of the variance. Pc1 is associated with the GNI variable. So, the Gross National Income per capita explains 99.99% of the principal component 1 of the data. 0.01 % is associated with maternal mortalility rate. This is the not standardized data set, that's why we get this result.
+
+***
   
-## 1.3.2. Principal component analysis (PCA) on the **standardized** human data set 
+### 1.3.2. Principal component analysis (PCA) on the **standardized** human data set 
   
 First we are scaling the data set so that the human is standardized so that the mean of all values is 0 and the standard diviation reaches 1. See here the summary table of the standardized data set.  
 
@@ -196,50 +198,113 @@ We can see that in the PCA of the non-standardized human data set the principal 
 The PCA of standardized values looks quite different. You can see that the PC1 & PC2 values spread all over the biplot and more variables are associated to the two principal components.  
   
 The angle between the arrows represents the original features of the data set and we can interpret it as the correlation between these features. Is the angle between the arrows small, then there is a positive correlation.  
-Also the angle between the feature and the principal component can be interpreted as the correlation between these two components. Again, if the angle is small there is a positive correlation. The length of the arrows is proportianl to the standard deviation of the features.  
+Also the angle between the feature and the principal component can be interpreted as the correlation between these two components. Again, if the angle is small there is a positive correlation. The length of the arrows is proportional to the standard deviation of the features.   
   
-**Give your personal interpretations**  
-of the first two principal component dimensions based on the biplot drawn after PCA on the standardized human data. 
-  
-  
-## 2. Multiple Correspondence Analysis (MCA) 
-  
-```{r, factominer, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
+***  
 
+## 2. Multiple Correspondence Analysis (MCA) 
+
+## 2.1. Tea consumption behaviour MCA  
+
+The "tea" data set includes data about tea consumption. Following, you see the MCA of the tea data set as it was performed on the DataCamp exercise.
+
+### 2.1.1. Load the data set & check it  
+
+```{r, factominer, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
+# load the package and the tea data set
 library(FactoMineR)
 data(tea)
 
+# check the tea data set
 str(tea)
-dim(tea)
+```
 
+***
+
+### 2.1.2. Data overview
+
+```{r, tea1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
 # column names to keep in the dataset
-keep_tea <- c("Tea", "How", "how", "sugar", "where", "lunch")
+keep_tea <- c("Tea", "How", "how", "sugar", "where", "lunch") # from DataCamp
 
 # select the 'keep_columns' to create a new dataset
 tea_time <- select(tea, one_of(keep_tea))
 
 gather(tea_time) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_bar(fill = "darkgreen") + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
+```
+  
+***
+  
+### 2.1.3. MCA
 
-
+```{r, tea1mca1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
 # multiple correspondence analysis
-mca_tea <- MCA(tea_time, graph = FALSE)
+mca_tea_time <- MCA(tea_time, graph = FALSE)
 
 # summary of the model
-summary(mca_tea)
+summary(mca_tea_time)
 
 # visualize MCA
-plot(mca_tea, invisible=c("ind"), habillage = "quali")
+plot(mca_tea_time, invisible=c("ind"), habillage = "quali")
+```
+  
+***
 
+### 2.1.4. MCA, different biplot using "factoextra" package  
 
+Here the MCA presented in another MCA biplot, performed with the function 'fviz_mca_biplot()' which is available from the 'factoextra' package. Here I added as  a individual value colour the cosine-squared (cos2), a value between 0 & 1. As closer to 1 this value gets as better it is projected on the dimension.
+```{r, tea1mca2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
+#draw a MCA biplot using factoextra function "fviz_mca_biplot"
 
+fviz_mca_biplot(mca_tea_time, col.ind = "cos2", col.var = "red", label = "var", geom =  c("point","text"), labelsize = 4, arrows = c(FALSE,TRUE)) + labs(title = "MCA of tea consumption behaviour") + theme_grey() + theme(axis.line = element_line(size = 0.5), panel.background = element_rect(fill = "gray93"))
+```
+  
+***
 
-fviz_mca_biplot(mca_tea)
+## 2.2. Another MCA analysis of different "tea" variables (reasons for drinking tea)
 
+I want to know which reasons for drinking tea people have. So I have choosen following six variables to analyse by MCA:  
 
+* *sex* --> Gender of the tea consumer
+* *age_Q* --> Age class of the tea consumer
+* *spirituality* --> Spiritual reason to drink tea
+* *healthy* --> Health reason to drink tea
+* *slimming* --> Tea consumer wants to loose weight or not
+* *relaxing* --> Relaxation effect on tea on consumer or not
+  
+I prepare a separate tea_reason data set and perform the MCA of that data aliquote.
 
+### 2.2.1. Prepare the data set and overview graph
 
+```{r, tea2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
+# column names to keep for my analysis
+keep_reason <- c("sex", "age_Q", "spirituality", "healthy", "slimming", "relaxing")
 
+# select the 'keep_columns' to create a new dataset
+tea_reason <- select(tea, one_of(keep_reason))
+
+gather(tea_reason) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_bar(fill = "darkviolet", alpha = 0.6) + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
 ```
 
+### 2.2.2. MCA of the "tea_reason" data
 
+```{r, tea2mca, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
 
+# multiple correspondence analysis
+mca_tea_reason <- MCA(tea_reason, graph = FALSE)
+
+# summary of the model
+summary(mca_tea_reason)
+
+# draw the MCA biplot
+fviz_mca_biplot(mca_tea_reason, col.ind = "cos2", col.var = "red", alpha.var = "contrib", label = "var", geom =  c("point","text"), labelsize = 3.5, arrows = c(FALSE,TRUE)) + labs(title = "MCA of tea consumption reasons") + theme_grey() + theme(axis.line = element_line(size = 0.5), panel.background = element_rect(fill = "gray93"))
+```
+  
+The biplot shows interesting results. Variable categories which are very close show higher similarity. The plot includes two colour schemes representing the "cos2" of the individuals (as closer to 1 as better it is projected on the dimension) and the contribution of the variables to the dimenstions("contrib"). The biplot gives following information:  
+
+* Men in the age of 25-34 drink tea not for health or weight loss reasons
+* People in the age class of 45-59 show similarities with no relaxation and no spirituality reason for drinking tea
+* People in the age class of 15-24, spirituality and relaxation reason are close and thereby similar
+* Women & age class of 60+ have similarities with drinking tea for health and weight loosing reasons  
+
+***
