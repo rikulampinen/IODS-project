@@ -88,6 +88,7 @@ read.table(file =
 
 
 
+######################################################################################################################
 
 # Exercise - chapter 5 continued -------------------------------------------------------------------------------------
 
@@ -186,7 +187,7 @@ str(human_analys)
 
 # 6. Save the human data frame as a .txt file ----
 
-# I overwrite my old human table
+# The wrangled data set is saved as a new txt file
 write.table(human_analys,
             file = "C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IODS-project/data/human_analys.txt",
             col.names = TRUE, row.names = TRUE)

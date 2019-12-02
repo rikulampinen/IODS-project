@@ -185,7 +185,7 @@ biplot(pca_human_stzd, choices = 1:2, cex = c(0.5, 0,9), col = c("grey40", "deep
 **Also here another kind of biplot**
 ```{r, stdzd_human_PCA2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align="center"}
 # more advanced biplot
-autoplot(prcomp(human_stzd), data = human, colour = "darkgreen", label= FALSE, label.size = 3.0, loadings = TRUE, loadings.label = TRUE, loadings.colour = "red",) + ggtitle("PCA biplot of standardized human data set") + xlab(paste0(pca_label2.1))  + ylab(paste0(pca_label2.2)) + theme_bw()
+autoplot(prcomp(human_stzd), data = human, colour = "darkgreen", label= TRUE, label.size = 3.0, loadings = TRUE, loadings.label = TRUE, loadings.colour = "red",) + ggtitle("PCA biplot of standardized human data set") + xlab(paste0(pca_label2.1))  + ylab(paste0(pca_label2.2)) + theme_bw()
 ```
   
 The principal component representing 16.2% of the data variation is strongly associated with parliament representatives and the labour force ratio (female / male). So the occurance of of woman in the labour market and in the political representation is mostly associated with principal component 2. 
