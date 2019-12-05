@@ -1,4 +1,4 @@
-# Chapter 6: Dimensionality reduction techniques
+# Chapter 6: Analysis of longitudinal data
 
 ### Data wrangling and performing an analysis of longitudinal data
 
@@ -10,7 +10,6 @@ The data wrangling of two data sets (bprs & rats) was performed before. The scri
 
 
 ## 1. Load and check the data sets
-
 
 ## 1.1. Load the wide (bprs & rats) and long (bprs_l & rats_l) data sets
 
@@ -40,7 +39,11 @@ rats_l <- read.table("C:/Users/richla/OneDrive/1 C - R-Folder/11-IODS-course/IOD
 # check the data sets
 str(bprs_l) 
 str(rats_l)
+```
+  
+The data sets show that the categorical variables "treatmeant" and "subject"  in the BPRS data set and the categorical variables "Group" and "ID" in the RATS data set were read as numbers. So I factorized them again. See the code below.  
 
+```{r, checkdata1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
 # bprs data --> factor treatment & subject
 bprs_l$treatment <- factor(bprs_l$treatment)
 bprs_l$subject <- factor(bprs_l$subject)
@@ -50,28 +53,41 @@ rats_l$ID <- factor(rats_l$ID)
 rats_l$Group <- factor(rats_l$Group)
 
 # check the data again
-glimpse(bprs_l)
-glimpse(rats_l)
+str(bprs_l)
+str(rats_l)
 ```
-  
-The categorical variables were not set as factors anymore, so I factorized them again. See the upper code.
-  
-The BPRS data set:  
-The BPRS (brief psychiatric rating scale) was measured on 40 male subjects with 2 treatment groups. One BPRS measurement was done before treatment started (week0), then weekly measurements followed up to 8 weeks in total.
+ 
+*** 
+## 1.2.The long data sets (bprs_l & rats_l)  
 
-Rats data set:
---> 
+**The BPRS data set:**    
+The BPRS (brief psychiatric rating scale) was measured on 40 male subjects with 2 treatment groups. One BPRS measurement was done before treatment started (week0), then weekly measurements followed up to 8 weeks in total. The BPRS assesses according to Vehkalahti & Everitt, 2019 the level of 18 symptom constructs which are used to evaluate if patients have schizophrenia. The BRRS symptoms constructs are measured in rates from 1 (not present) to 7 (extremely severe).
+The "long" BPRS data set `bprs_l` consists of 5 variables with 360 observations. These variables include:  
   
-***  
+* *treatment* - the psychological treatment the male subjects (treatment 1 & 2)  
+* *subject* - the male individuals identification number
+* *weeks* - the factor variable showing the week of treatment and BPRS evaluation
+* *bprs* - the bprs values
+* *week* - the week number of the BPRS evaluation  
   
-## 1.2.The long data sets (bprs_l & rats_l)
-
-```{r, checkdata, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+```{r, checkdata2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
 # bprs_l data set
 knitr::kable(bprs_l, caption = "BPRS - long data set") %>% 
   kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") %>% 
   scroll_box(height = "300px")
+```  
+  
+    
+**The RATS data set:**  
+This data consists of measurements on how rats grow. There were 3 groups of rats defined which got a different diet and the body weight of each animal was measured over a period of 9 weeks. The research question is if the growth profiles of the different diet groups differ (Vehkalahti & Everitt ,2019). The "long" RATS data set `rats_l` consists of 5 variables with 176 observations. The variables include:  
 
+* *ID* - the individual rat's identification number
+* *Group* - the diet group (1, 2 & 3)
+* *WD* - the factorial value of the time (the day when the rats' weights were measured)
+* *Weight* - weight of each individual rat at the given day
+* *Time* - the time point of the weight measurement (days)  
+  
+```{r, checkdata3, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
 # rats_ data set
 knitr::kable(rats_l, caption = "RATS - long data set") %>% 
   kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") %>% 
@@ -82,34 +98,36 @@ knitr::kable(rats_l, caption = "RATS - long data set") %>%
   
 ## 2. Analysis of the long data sets (bprs_l & rats_l)
 
-The data set analyses are swapped. So we run the data analyses of MABS book chapter 8 on the "rats_l" data set and the analyses of MABS book chapter 9 on the "bprs_l" data set.
+The data set analyses presented in the MABS book and the DataCamp platform are swapped. So we run the data analyses of MABS book chapter 8 on the "rats_l" data set and the analyses of MABS book chapter 9 on the "bprs_l" data set. 
 
-## 3. Analyses of Chapter 8 of MABS using the RATS data (rats_l)
+## 3. Analyses of chapter 8 of MABS using the RATS data (rats_l)
+ 
+The long `rats_l` data will be analysed according to the instructions from chapter 8 of MABS. We start as a first step with a graphical overview of the data.
 
 ### 3.1. A first plot
 
-```{r, rats_lanalysis1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
-# rats_l data set
-
+```{r, rats_l1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 # plot 1
 ggplot(rats_l, aes(x = Time, y = Weight, linetype = ID)) +
-  geom_line() +
-  scale_linetype_manual(values = rep(1:16, times = 11)) + # needs to be checked!!!
+  geom_line(color = "darkgreen") +
+  scale_linetype_manual(values = (1:16)) + # there are 16 IDs and in total 11 measurements
   facet_grid(. ~ Group, labeller = label_both) +
-  theme(legend.position = "bottom") +
+  theme(legend.position = "right") +
   scale_y_continuous(limits = c(min(rats_l$Weight), max(rats_l$Weight))) + 
-  ggtitle("RATS - long data")
+  ggtitle("RATS long data set")
 ```
 
-? What to do with + scale_linetype_manual(values = rep(1:10, times=4))
+Here the `rats_l` data is plotted. The x-axis with the "Time" represents the days of the weight measurements, the y-axis shows the weights of the individual rats at the different measurement times. The plot is splitted into the three different diet groups. What can be seen in the graph is that the rat's starting weights in group 2 & 3 were higher than in group 1 and that the weights in group 2 & 3 increased in quite high rates, while in group 1 it seems that the weights increased in a much smaller rate.  
+The data also shows the *"tracking"* phenomena (acc. MABS book, Vehkalahti & Everitt, 2019) where rats with a higher starting weight tend to have a higher weight increase over time. To make this *tracking* seen more clearly we standardise the `rats_l` data set.
 
 ***
 
 ### 3.2. Standardized data
 
-```{r, rats_lanalysis2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
-head(rats_l)
+The `rats_l` data set is standardised by calculating the "StdWeight"with following formular:  $StdWeight = (Weight - Mean(Weight)) / SD (weight)$  
+The calculated StdWeight is added as a new variable to the `rats_l` data set. Then the StdWeight is plotted.
 
+```{r, rats_lanalysis2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 # Standardise the variable Weight
 rats_l <- rats_l %>%
   group_by(Time) %>%
@@ -121,28 +139,52 @@ glimpse(rats_l)
 
 # Plot again with the standardised rats_l
 ggplot(rats_l, aes(x = Time, y = StdWeight, linetype = ID)) +
-  geom_line() +
+  geom_line(color = "darkred") +
   scale_linetype_manual(values = rep(1:16, times=11)) +
   facet_grid(. ~ Group, labeller = label_both) +
-  scale_y_continuous(name = "Standardized Weight") +
-  ggtitle("Standardized Weight")
-
+  scale_y_continuous(name = "StdWeight - standardized Weight values") +
+  ggtitle("RATS - standardized Weight values")
 ```
+  
+The "stdWeight" plot shows
+
+
 
 ***
   
 ### 3.3. Summary graphs
-
+  
+First you see an overview of the rats weights over the whole measurement period with boxplots. The different diet groups are seen in different colors.
 ```{r, rats_lanalysis3, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+# add the Time as a categorical variable "Time1"
+rats_l <- rats_l %>%
+  mutate(Time1 = factor(rats_l$Time)) %>%
+  ungroup()
+
+# check the data 
 str(rats_l)
 
+# prepare a boxplot of the "rats_l" data set
+ggplot(data = rats_l, aes(x = rats_l$Time1, y = Weight, fill = rats_l$Group)) +
+  geom_boxplot() +
+  ylab("Weight") + 
+  xlab("Weight measurement time points [days]") +
+  ggtitle("Rat weights over the measurment period") +
+  scale_fill_discrete(name = "Diet group") +
+  theme(legend.position = "right") 
+```
+  
+Now, the sample number `n_rats` of the individually measured rat weights are calculated (in total 11 weight measurements, so n = 11). Then a new table `rats_s` is prepared, where the calculated mean weight of all rats & the standard error of each diet group is added as a variable. The standard error is calculated via following formular: $SE = SD(Weight)/ \sqrt n$
+This new data table is then presented in the next plot.
+
+```{r, rats_lanalysis4, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 # Number of Time, baseline (Time = 1) included
 n_rats <- rats_l$Time %>% unique() %>% length()
-n_rats
+
 # Summary data with mean and standard error of rats_l by group and time 
 rats_s <- rats_l %>%
   group_by(Group, Time) %>%
-  summarise( mean = mean(Weight), se = (sd(Weight)/sqrt(n_rats))) %>%
+  summarise(mean = mean(Weight), se = (sd(Weight)/sqrt(n_rats))) %>%
   ungroup()
 
 # Glimpse the data
@@ -150,27 +192,28 @@ str(rats_s)
 
 # Plot the mean profiles
 ggplot(rats_s, aes(x = Time, y = mean, linetype = Group, shape = Group)) +
-  geom_line(col = "darkgreen") +
+  geom_line(col = "darkgreen", size = 0.6) +
   scale_linetype_manual(values = c(1,2,3)) +
   geom_point(size=2) +
-  scale_shape_manual(values = c(1,2,3)) +
+  scale_shape_manual(values = c(20,17,18)) +
   geom_errorbar(aes(ymin=mean-se, ymax=mean+se, linetype="1"), width=0.8) +
   theme(legend.position = "right") +
-  scale_y_continuous(name = "mean(Weight) +/- se(Weight)")
+  scale_y_continuous(name = "Mean (Weight) +/- SE (Weight)") + 
+  ggtitle("Mean weight profiles of the differant diet groups")
 ```
 
 ***
 
 ### 3.4. Find the outlier
 
-```{r, rats_lanalysis4, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+```{r, rats_lanalysis5, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 str(rats_l)
 
 # Create a summary data by Group and ID with mean as the summary variable (ignoring baseline Time 1).
 rats_l10s <- rats_l %>%
   filter(Time > 1) %>%
   group_by(Group, ID) %>%
-  summarise( mean=mean(Weight) ) %>%
+  summarise(mean=mean(Weight)) %>%
   ungroup()
 
 # Glimpse the data
@@ -184,7 +227,10 @@ ggplot(rats_l10s, aes(x = Group, y = mean)) +
 
 # Create a new data by filtering the outliers and adjust the ggplot code the draw the plot again with the new data
 rats_l10s1 <- rats_l10s %>%
-    filter(mean < 550) %>%
+    filter(
+      (mean > 250 & Group == 1) | 
+      (mean < 550 & Group == 2) |
+      (mean > 500 & Group == 3))  %>% 
       ungroup()
 str(rats_l10s1)
 
@@ -201,11 +247,13 @@ ggplot(rats_l10s1, aes(x = Group, y = mean)) +
 ### 3.5. T-test and ANOVA
 
 
-```{r, rats_lanalysis5, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+```{r, rats_lanalysis6, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 str(rats_l10s1)
 
 # Two-sample t-test
 t.test(mean ~ Group == c(1,3), data = rats_l10s1) # that needs to be checked !!!!!!!!!!!!!!!!!!!
+# cannot be done on three groups
+
 
 # Add the baseline from the original data as a new variable to the summary data
 rats_l10s2 <- rats_l10s %>%
@@ -215,9 +263,21 @@ rats_l10s2
 
 # Fit the linear model with the mean as the response 
 rats_fit <- lm(mean ~ baseline + Group, data = rats_l10s2)
+rats_fit
 
 # Compute the analysis of variance table for the fitted model with anova()
 anova(rats_fit)
+
+
+
+
+
+# compute the anova with aov()
+rats_aov <- aov(rats_fit)
+rats_aov
+
+# compare the anova results with tukeyHSD
+TukeyHSD(rats_aov, "Group", ordered = TRUE, conf.level = 0.95)
 ```
 Check the results on the two sample t.test --> this needs to be checked
 I could compare via t.test group 1 & 2 / 1 & 3 / 2 & 3
@@ -278,6 +338,14 @@ bprs_l_rim <- lmer(bprs ~ week + treatment + (1 | subject), data = bprs_l, REML 
 
 # Print the summary of the model
 summary(bprs_l_rim)
+
+
+
+
+# confidence interval --> 1.96 * standard error
+# t value --> test if the value (+/- confidence interval can be 0)
+# the mixed model (lmer) takes into account the correlations between the observations (here between the subjects) --> so it is more accurate --> the standard
+# p-value can be calculated  by inverse function of t value --> a function to invert the t value to the p value!!
 ```
   
 
@@ -289,6 +357,11 @@ summary(bprs_l_rim)
 
 # create a random intercept and random slope model
 bprs_l_rim1 <- lmer(bprs ~ week + treatment + (week | subject), data = bprs_l, REML = FALSE)
+
+
+# here the other times (weeks) are included - your get a regression model defined for each subject for each time period (for each week) - so here 9 (0-8 weeks) different regression models 
+# so it inclueds
+
 
 # print a summary of the model
 summary(bprs_l_rim1)
