@@ -13,7 +13,7 @@ The data wrangling of two data sets (bprs & rats) was performed before. The scri
 
 ## 1.1. Load the wide (bprs & rats) and long (bprs_l & rats_l) data sets
 
-```{r, packages, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+```{r, packageload, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
 # load necessary packages
 library(tidyr)
 library(dplyr)
@@ -26,7 +26,7 @@ library(stringr)
 library(lme4)
 ```
 
-```{r, loaddata, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+```{r, loaddata2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
 # load the wide data sets
 bprs <- read.table("https://raw.githubusercontent.com/KimmoVehkalahti/MABS/master/Examples/data/BPRS.txt", sep = " ", header = TRUE)
 
@@ -43,7 +43,7 @@ str(rats_l)
   
 The data sets show that the categorical variables "treatmeant" and "subject"  in the BPRS data set and the categorical variables "Group" and "ID" in the RATS data set were read as numbers. So I factorized them again. See the code below.  
 
-```{r, checkdata1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+```{r, check1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
 # bprs data --> factor treatment & subject
 bprs_l$treatment <- factor(bprs_l$treatment)
 bprs_l$subject <- factor(bprs_l$subject)
@@ -70,7 +70,7 @@ The "long" BPRS data set `bprs_l` consists of 5 variables with 360 observations.
 * *bprs* - the bprs values
 * *week* - the week number of the BPRS evaluation  
   
-```{r, checkdata2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+```{r, check2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
 # bprs_l data set
 knitr::kable(bprs_l, caption = "BPRS - long data set") %>% 
   kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") %>% 
@@ -87,7 +87,7 @@ This data consists of measurements on how rats grow. There were 3 groups of rats
 * *Weight* - weight of each individual rat at the given day
 * *Time* - the time point of the weight measurement (days)  
   
-```{r, checkdata3, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+```{r, check3, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
 # rats_ data set
 knitr::kable(rats_l, caption = "RATS - long data set") %>% 
   kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") %>% 
@@ -106,7 +106,7 @@ The long `rats_l` data will be analysed according to the instructions from chapt
 
 ### 3.1. A first plot
 
-```{r, rats_l1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+```{r, rats1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 # plot 1
 ggplot(rats_l, aes(x = Time, y = Weight, linetype = ID)) +
   geom_line(color = "darkgreen") +
@@ -127,7 +127,7 @@ The data also shows the *"tracking"* phenomena (acc. MABS book, Vehkalahti & Eve
 The `rats_l` data set is standardised by calculating the "StdWeight"with following formular:  $StdWeight = (Weight - Mean(Weight)) / SD (weight)$  
 The calculated StdWeight is added as a new variable to the `rats_l` data set. Then the StdWeight is plotted.
 
-```{r, rats_lanalysis2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+```{r, rats2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 # Standardise the variable Weight
 rats_l <- rats_l %>%
   group_by(Time) %>%
@@ -155,7 +155,7 @@ The "stdWeight" plot shows
 ### 3.3. Summary graphs
   
 First you see an overview of the rats weights over the whole measurement period with boxplots. The different diet groups are seen in different colors.
-```{r, rats_lanalysis3, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+```{r, rats3, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 # add the Time as a categorical variable "Time1"
 rats_l <- rats_l %>%
   mutate(Time1 = factor(rats_l$Time)) %>%
@@ -177,7 +177,7 @@ ggplot(data = rats_l, aes(x = rats_l$Time1, y = Weight, fill = rats_l$Group)) +
 Now, the sample number `n_rats` of the individually measured rat weights are calculated (in total 11 weight measurements, so n = 11). Then a new table `rats_s` is prepared, where the calculated mean weight of all rats & the standard error of each diet group is added as a variable. The standard error is calculated via following formular: $SE = SD(Weight)/ \sqrt n$
 This new data table is then presented in the next plot.
 
-```{r, rats_lanalysis4, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+```{r, rats4, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 # Number of Time, baseline (Time = 1) included
 n_rats <- rats_l$Time %>% unique() %>% length()
 
@@ -206,7 +206,7 @@ ggplot(rats_s, aes(x = Time, y = mean, linetype = Group, shape = Group)) +
 
 ### 3.4. Find the outlier
 
-```{r, rats_lanalysis5, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+```{r, rats5, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 str(rats_l)
 
 # Create a summary data by Group and ID with mean as the summary variable (ignoring baseline Time 1).
@@ -247,7 +247,7 @@ ggplot(rats_l10s1, aes(x = Group, y = mean)) +
 ### 3.5. T-test and ANOVA
 
 
-```{r, rats_lanalysis6, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+```{r, rats6, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 str(rats_l10s1)
 
 # Two-sample t-test
@@ -279,6 +279,7 @@ rats_aov
 # compare the anova results with tukeyHSD
 TukeyHSD(rats_aov, "Group", ordered = TRUE, conf.level = 0.95)
 ```
+
 Check the results on the two sample t.test --> this needs to be checked
 I could compare via t.test group 1 & 2 / 1 & 3 / 2 & 3
 
