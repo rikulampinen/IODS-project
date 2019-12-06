@@ -19,6 +19,7 @@ library(tidyr)
 library(dplyr)
 library(corrplot)
 library(ggplot2)
+library(ggthemes)
 library(GGally)
 library(knitr)
 library(kableExtra)
@@ -108,15 +109,16 @@ The long `rats_l` data will be analysed according to the instructions from chapt
 
 ```{r, rats1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 # plot 1
-ggplot(rats_l, aes(x = Time, y = Weight, linetype = ID)) +
+ggplot(rats_l, aes(x = Time, y = Weight,linetype = ID)) +
   geom_line(color = "darkgreen") +
-  scale_linetype_manual(values = (1:16)) + # there are 16 IDs and in total 11 measurements
+  scale_linetype_manual(values = rep(1:6, times= 3)) + # there are 16 IDs (6 linetypes are available - so repeated 3 times)
   facet_grid(. ~ Group, labeller = label_both) +
   theme(legend.position = "right") +
   scale_y_continuous(limits = c(min(rats_l$Weight), max(rats_l$Weight))) + 
-  ggtitle("RATS long data set")
+  ggtitle("RATS: long data set ")
 ```
-
+  
+  
 Here the `rats_l` data is plotted. The x-axis with the "Time" represents the days of the weight measurements, the y-axis shows the weights of the individual rats at the different measurement times. The plot is splitted into the three different diet groups. What can be seen in the graph is that the rat's starting weights in group 2 & 3 were higher than in group 1 and that the weights in group 2 & 3 increased in quite high rates, while in group 1 it seems that the weights increased in a much smaller rate.  
 The data also shows the *"tracking"* phenomena (acc. MABS book, Vehkalahti & Everitt, 2019) where rats with a higher starting weight tend to have a higher weight increase over time. To make this *tracking* seen more clearly we standardise the `rats_l` data set.
 
@@ -124,7 +126,7 @@ The data also shows the *"tracking"* phenomena (acc. MABS book, Vehkalahti & Eve
 
 ### 3.2. Standardized data
 
-The `rats_l` data set is standardised by calculating the "StdWeight"with following formular:  $StdWeight = (Weight - Mean(Weight)) / SD (weight)$  
+The `rats_l` data set is standardised by calculating the "StdWeight"with following formular:  $StdWeight = (Weight - Mean(Weight)) / SD (Weight)$  
 The calculated StdWeight is added as a new variable to the `rats_l` data set. Then the StdWeight is plotted.
 
 ```{r, rats2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
@@ -140,15 +142,15 @@ glimpse(rats_l)
 # Plot again with the standardised rats_l
 ggplot(rats_l, aes(x = Time, y = StdWeight, linetype = ID)) +
   geom_line(color = "darkred") +
-  scale_linetype_manual(values = rep(1:16, times=11)) +
+  scale_linetype_manual(values = rep(1:6, times=3)) +
   facet_grid(. ~ Group, labeller = label_both) +
   scale_y_continuous(name = "StdWeight - standardized Weight values") +
-  ggtitle("RATS - standardized Weight values")
+  ggtitle("RATS: standardized Weight values") + 
+  theme(panel.grid.major.y = element_line(colour = "grey40"))
 ```
   
-The "stdWeight" plot shows
-
-
+  
+The "StdWeight"-plot shows the standardized weight values over the measurement period. Here the "tracking" (higher starting weights tent to increase more compared to lower weights and stay on a higher value for the measurement period) can be seen much better.  
 
 ***
   
@@ -191,23 +193,27 @@ rats_s <- rats_l %>%
 str(rats_s)
 
 # Plot the mean profiles
-ggplot(rats_s, aes(x = Time, y = mean, linetype = Group, shape = Group)) +
-  geom_line(col = "darkgreen", size = 0.6) +
-  scale_linetype_manual(values = c(1,2,3)) +
-  geom_point(size=2) +
-  scale_shape_manual(values = c(20,17,18)) +
+ggplot(rats_s, aes(x = Time, y = mean, linetype = Group,  color = Group, shape = Group)) +
+  geom_line(size = 0.6) +
+  scale_linetype_manual(name = "Diet group", values = c(1,2,3)) +
+  geom_point(size=1.5) +
+  scale_shape_manual(name = "Diet group", values = c(16,17,18)) +
+  scale_color_manual(name = "Diet group", values = c("red", "darkgreen", "blue")) +
   geom_errorbar(aes(ymin=mean-se, ymax=mean+se, linetype="1"), width=0.8) +
   theme(legend.position = "right") +
   scale_y_continuous(name = "Mean (Weight) +/- SE (Weight)") + 
-  ggtitle("Mean weight profiles of the differant diet groups")
+  ggtitle("Mean weight profiles of the different diet groups")
 ```
+  
+This graph shows the rat weight development of the three different diet groups over the measurement period. Group 1 starts on a lower level and the weight increases just slightly (~250 to 280). Group 2 and group 3 weights start form a higher values and also the rats's weights decrease on a higher level (in group 2 an increase of more that 50 (+/- of course...), in group 3 around 50 (+/- a smaller value)). What you can see is that the standard errors in group 2 & 3 are much higher, so there is a much bigger weight difference between the individual rats within the diet group.  
 
 ***
 
 ### 3.4. Find the outlier
 
+Here we will have now a look how the rat's weight developed after the first measurement. Therefore we prepare a new data table `rats_l10s` where the weight data without time = 1 is summarised by calculating the mean value of weight per diet group.
+
 ```{r, rats5, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
-str(rats_l)
 
 # Create a summary data by Group and ID with mean as the summary variable (ignoring baseline Time 1).
 rats_l10s <- rats_l %>%
@@ -218,13 +224,23 @@ rats_l10s <- rats_l %>%
 
 # Glimpse the data
 glimpse(rats_l10s)
-
+```
+  
+From this new data table we prepare a boxplot:
+```{r, rats6, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 # Draw a boxplot of the mean versus group
-ggplot(rats_l10s, aes(x = Group, y = mean)) +
+ggplot(rats_l10s, aes(x = Group, y = mean, fill = Group)) +
   geom_boxplot() +
-  stat_summary(fun.y = "mean", geom = "point", shape=23, size=4, fill = "darkgreen") +
-  scale_y_continuous(name = "mean(Weight), Time 8-64")
+  stat_summary(fun.y = "mean", geom = "point", shape=23, size=3, fill = "black") +
+  scale_y_continuous(name = "Mean (Weight) / Time 8-64 [days]") + 
+  xlab("Diet group") + 
+  scale_fill_discrete(name = "Diet group") +
+  ggtitle("Mean weights of diet groups excluding the first measurement")
+```
+  
+The boxplot shows the mean rat weights of each diet group of the measurements after the first measurement (day 1). The boxplots of all three diet groups actually show an outlier. These outliers can disturb conclusions from further comparisons of the diet groups. So we have to remove these outliers as I did it for each group seen in the code below. I filter out the outliers and create a new data table `rats_l10s1` where the mean values without the outliers are collected. Then a new boxplot of the diet groups is prepared.
 
+```{r, rats7, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 # Create a new data by filtering the outliers and adjust the ggplot code the draw the plot again with the new data
 rats_l10s1 <- rats_l10s %>%
     filter(
@@ -232,60 +248,99 @@ rats_l10s1 <- rats_l10s %>%
       (mean < 550 & Group == 2) |
       (mean > 500 & Group == 3))  %>% 
       ungroup()
+
 str(rats_l10s1)
 
 # Draw a boxplot of the mean versus group with the outlier filtered data
-ggplot(rats_l10s1, aes(x = Group, y = mean)) +
+ggplot(rats_l10s1, aes(x = Group, y = mean, fill = Group)) +
   geom_boxplot() +
-  stat_summary(fun.y = "mean", geom = "point", shape=23, size=4, fill = "darkgreen") +
-  scale_y_continuous(name = "mean(Weight), Time 8-64")
+  stat_summary(fun.y = "mean", geom = "point", shape=23, size=4, fill = "black") +
+  scale_y_continuous(name = "Mean (Weight) / Time 8-64 [days]") +
+  xlab("Diet group") + 
+  scale_fill_discrete(name = "Diet group") +
+  ggtitle("Mean weights of diet groups excluding the first measurement")
 ```
-
+  
+Here we see the boxplot graph with the weights means over the measurement period 8 to 64 days without outlier values. With that data we continue to analyse the diet group differences.
 
 ***
 
 ### 3.5. T-test and ANOVA
 
+We cannot perform a t-test between the groups since we have 3 groups and not 2 groups.
 
-```{r, rats6, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
-str(rats_l10s1)
-
-# Two-sample t-test
-t.test(mean ~ Group == c(1,3), data = rats_l10s1) # that needs to be checked !!!!!!!!!!!!!!!!!!!
+```
+t.test(mean ~ rats_l10s2$Group == 2, paired = TRUE) 
+# Two-sample t-test group 1 & 3
+t.test(mean ~ Group == 3, data = rats_l10s1) 
 # cannot be done on three groups
+```  
+Now we continue with creating a new data table `rats_l10s2`where a so called "baseline" weight values are created from the first weigh measurement on day 1 (WD1). So each group weight baseline was defined. See the table below with the mean weight values of the whole measurement period and the starting weight
 
-
+```{r, rats9, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 # Add the baseline from the original data as a new variable to the summary data
 rats_l10s2 <- rats_l10s %>%
   mutate(baseline = rats$WD1)
 
-rats_l10s2
-
-# Fit the linear model with the mean as the response 
-rats_fit <- lm(mean ~ baseline + Group, data = rats_l10s2)
-rats_fit
-
-# Compute the analysis of variance table for the fitted model with anova()
-anova(rats_fit)
-
-
-
-
-
-# compute the anova with aov()
-rats_aov <- aov(rats_fit)
-rats_aov
-
-# compare the anova results with tukeyHSD
-TukeyHSD(rats_aov, "Group", ordered = TRUE, conf.level = 0.95)
+# check the data table
+rats_l10s2 %>% knitr::kable() %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") %>% scroll_box(height = "300px")
 ```
 
-Check the results on the two sample t.test --> this needs to be checked
-I could compare via t.test group 1 & 2 / 1 & 3 / 2 & 3
+Using this new data table with the mean weight values and the baseline weight values we perform an anova test to see which diet group had the highest weight increase over the measurement period. there are differences between the diet groups. In the following codes I run first a linear model comparing the group means to each other (from the data table `rats_l10s2` excluding the starting weight measurement) and in the second linear model I compare the baseline weights of each group with the mean weight value of each group (also from the `rats_l10s2` data table).  
 
+I continue now to compare the diet group differences with performing an ANOVA and a post-hoc test (TukeyHSD) to compare the group means, since I want to know if the diet groups are different from each other. The ANOVA is performed from the data table `rats_l10s2`. This is the data table without the first measurement (start value) and inluding the outlier values.
+
+```{r, rats10, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+# linear regression model of mean values versus diet groups
+rats_fit1 <- lm(mean ~ Group, data = rats_l10s2)
+# regression model output
+round(rats_fit1$coefficients, digits = 2) %>% knitr::kable() %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center")
+```
+  
+The model shows that the mean value of group 2 is 222g higher and the mean value of group 3 is 262g higher compared to group 1 mean weights. Let's have a look now if the diet groups differ to each other. With a post-hoc test after the ANOVA we can check the group means.
+
+```{r, rats11, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+# Compute the analysis of variance table of rats_fit1 <- lm(mean ~ Group, data = rats_l10s2) with anova()
+rats_anova1 <- anova(rats_fit1)
+rats_anova1
+```
+  
+The ANOVA of the linear model of mean weight ~ diet group shows that group 2 has a significant different weight increase compared to group 1 & group 3.
+
+```{r, rats12, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+# another kind of anova calculation --> compute the anova with aov()
+rats_aov2 <- aov(mean ~ Group, data = rats_l10s2)
+summary(rats_aov2)
+
+# compare the anova results with tukeyHSD
+TukeyHSD(rats_aov2, "Group", ordered = TRUE, conf.level = 0.95)
+```
+  
+Here we can see that the secon ANOVA function gives the same result and this result can be put in the TukeyHSD function. This post-hoc test gives us then the differences between the diet groups. Group 1 & 2 are significantly different in the mean weight. Group 1 & 3 are as well. Group 2 and 3 are not significantly different in the weight means (there is the outlier influence).  
+  
+  
+Now lets see what is the difference of each group to the baselines.  
+  
+```{r, rats13, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+# Fit the linear model with the mean as the response 
+rats_fit2 <- lm(mean ~ baseline + Group, data = rats_l10s2)
+
+# regression model output
+round(rats_fit2$coefficients, digits = 2) %>% knitr::kable() %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center")
+```
+  
+Here a regression model of the mean rats weights compared to the weight baseline (the first weight measurement of each dietary group). The results shows that the weight difference between baseline and group 2 is around 34g and group 3 and baseline is around 23g different. So group 2 has actually the highest weight increase rates over the measurement period.
+  
+```{r, rats14, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+# Compute the analysis of variance table of rats_fit2 <- lm(mean ~ baseline + Group, data = rats_l10s2) with anova()
+rats_anova2 <- anova(rats_fit2)
+rats_anova2
+```
+  
+What is seen from the second ANOVA is that the baseline has a significant influence on the weight increase later in the different diet groups and that group 2 has a rather good significant weight increase relative to the baseline compared to group 1 and group 3. So it seems that diet 2 leads to the highest weight increase.
+  
 ***
-
-
+  
 ## 4. Analyses of Chapter 9 of MABS using the BPRS data (bprs_l)
 
 ### 4.1. A first plot
@@ -304,15 +359,14 @@ ggplot(bprs_l, aes(x = week, y = bprs, group = treatment)) +
 
 #plotting the bprs_l data
 ggplot(bprs_l, aes(x = week, y = bprs, linetype = subject)) +
-  geom_line() +
+  geom_line(color = "darkgreen") +
+  scale_linetype_manual(values = rep(1:6, times = 4)) +
   facet_grid(. ~ treatment, labeller = label_both) +
   scale_x_continuous(name = "Weeks", breaks = seq(0,8,1)) + 
   scale_y_continuous(name = "BPRS values observed", breaks = seq(10,100,5)) + 
   theme(legend.position = "bottom") + 
-  ggtitle("BPRS value overview")
-
-
-
+  ggtitle("BPRS: data values overview") +
+  theme(legend.box.background = element_rect(),legend.box.margin = margin(2, 2, 2, 2))
 ```
   
 ***
@@ -387,7 +441,8 @@ anova(bprs_l_rim2, bprs_l_rim1)
 
 # draw the plot of bprs_l
 ggplot(bprs_l, aes(x = week, y = bprs, linetype = subject)) +
-  geom_line() +
+  geom_line(color = "darkgreen") +
+  scale_linetype_manual(values = rep(1:6, times = 4)) +
   facet_grid(. ~ treatment, labeller = label_both) +
   scale_x_continuous(name = "Weeks", breaks = seq(0,8,1)) + 
   scale_y_continuous(name = "BPRS values observed", breaks = seq(10,100,5)) + 
@@ -402,7 +457,8 @@ bprs_l$fitted_bprs <- bprs_l_fit
 
 # draw the plot of fitted bprs values
 ggplot(bprs_l, aes(x = week, y = fitted_bprs, linetype = subject)) +
-  geom_line() +
+  geom_line(color = "darkred") +
+  scale_linetype_manual(values = rep(1:6, times = 4)) +
   facet_grid(. ~ treatment, labeller = label_both) +
   scale_x_continuous(name = "Weeks", breaks = seq(0,8,1)) + 
   scale_y_continuous(name = "BPRS values modeled", breaks = seq(10,100,5)) + 
