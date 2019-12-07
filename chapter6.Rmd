@@ -231,7 +231,7 @@ From this new data table we prepare a boxplot:
 # Draw a boxplot of the mean versus group
 ggplot(rats_l10s, aes(x = Group, y = mean, fill = Group)) +
   geom_boxplot() +
-  stat_summary(fun.y = "mean", geom = "point", shape=23, size=3, fill = "black") +
+  stat_summary(fun.y = "mean", geom = "point", shape = 23, size = 3, fill = "black") +
   scale_y_continuous(name = "Mean (Weight) / Time 8-64 [days]") + 
   xlab("Diet group") + 
   scale_fill_discrete(name = "Diet group") +
@@ -254,7 +254,7 @@ str(rats_l10s1)
 # Draw a boxplot of the mean versus group with the outlier filtered data
 ggplot(rats_l10s1, aes(x = Group, y = mean, fill = Group)) +
   geom_boxplot() +
-  stat_summary(fun.y = "mean", geom = "point", shape=23, size=4, fill = "black") +
+  stat_summary(fun.y = "mean", geom = "point", shape = 23, size = 3, fill = "black") +
   scale_y_continuous(name = "Mean (Weight) / Time 8-64 [days]") +
   xlab("Diet group") + 
   scale_fill_discrete(name = "Diet group") +
@@ -343,35 +343,56 @@ What is seen from the second ANOVA is that the baseline has a significant influe
   
 ## 4. Analyses of Chapter 9 of MABS using the BPRS data (bprs_l)
 
-### 4.1. A first plot
+### 4.1. First plots of the data
+  
+Here follows now the analysis of BPRS data set with linear mixed models. The BPRS data includes measurements over a period of 8 weeks with a starting value 0 (so all in all 9 BPRS determinations).  
 
 ```{r, bprs_lanalysis1, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
-
 str(bprs_l)
 
-#plotting the bprs_l data
-ggplot(bprs_l, aes(x = week, y = bprs, group = treatment)) +
-  geom_point() + 
-  scale_x_continuous(name = "Weeks", breaks = seq(0,8)) + 
-  scale_y_continuous(name = "BPRS value") + 
-  theme(legend.position = "top") + 
-  ggtitle("BPRS value overview")
+# overview plot
+pairs(bprs_l, col = bprs_l$subject)
 
-#plotting the bprs_l data
+#plotting the bprs_l data 1
+ggplot(bprs_l, aes(x = week, y = bprs, shape = subject, group = treatment)) +
+  geom_point(color = "darkgreen") + 
+  scale_shape_manual(values = rep(1:10, times = 2)) +
+  scale_x_continuous(name = "Weeks", breaks = seq(0,8,1)) + 
+  scale_y_continuous(name = "BPRS value") + 
+  theme(legend.position = "bottom") + 
+  ggtitle("BPRS: data values overview") +
+  theme(legend.box.background = element_rect(),legend.box.margin = margin(2, 2, 2, 2))
+
+#plotting the bprs_l data 2
 ggplot(bprs_l, aes(x = week, y = bprs, linetype = subject)) +
   geom_line(color = "darkgreen") +
   scale_linetype_manual(values = rep(1:6, times = 4)) +
   facet_grid(. ~ treatment, labeller = label_both) +
   scale_x_continuous(name = "Weeks", breaks = seq(0,8,1)) + 
   scale_y_continuous(name = "BPRS values observed", breaks = seq(10,100,5)) + 
-  theme(legend.position = "bottom") + 
-  ggtitle("BPRS: data values overview") +
+  theme(legend.position = "bottom") +
+  ggtitle("BPRS: data values overview by treatment") +
+  theme(legend.box.background = element_rect(),legend.box.margin = margin(2, 2, 2, 2))
+
+#plotting the bprs_l data 3
+ggplot(bprs_l, aes(x = week, y = bprs)) +
+  geom_line(aes(linetype = treatment), color = "darkgreen") +
+  scale_linetype_manual(values = rep(1:2, times = 1)) +
+  facet_grid(.~ subject) +
+  scale_x_continuous(name = "Weeks", breaks = seq(0,8,4)) + 
+  scale_y_continuous(name = "BPRS values observed", breaks = seq(10,100,5)) + 
+  theme(legend.position = "right") +
+  ggtitle("BPRS: data values overview by subject") +
   theme(legend.box.background = element_rect(),legend.box.margin = margin(2, 2, 2, 2))
 ```
+  
+The overview plots give us a glimpse into the data. We have 40 subjects in two treatment groups (so 20 in each group). After a first BPRS determination (week 0) the treatment started and 8 more BPRS determinations followed.  
   
 ***
 
 ### 4.2. Linear model of bprs data
+  
+We start with a first linear regression model with the BPRS value as dependent varibale and week + treatment as independent variables (explanatory variables).  
 
 ```{r, bprs_lanalysis2, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 
@@ -382,10 +403,13 @@ bprs_l_reg <- lm(bprs ~ week + treatment, data = bprs_l)
 summary(bprs_l_reg)
 ```
   
+This linear regression gives as a results that the measurement week has a significant effect on the BPRS values. With each new BRPS determination every week the BRPS value decreases by 2.2 units. Treatment 2 could have a better effect on the BPRS values of the subjects, but it does not show a significant influence. But are the treatments really helping the patients and are there some effects on the model by the subjects (the patients) with influence the model - therefore we add the subjects as a random effect term into a random intercept model.  
   
 *** 
 
 ### 4.3. Random Intercept Model
+  
+Now we perform a random intercept model on the BPRS data. We add as explanatory variables the measurement periods "week" and the "treatment" and add as the random-effects term the subjects (the 40 men which udnergoing the treatment and measurements). This model will consider the linear regression fit for each subject to the other subjects.
 
 ```{r, bprs_lanalysis3, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 # Create a random intercept model
@@ -393,43 +417,43 @@ bprs_l_rim <- lmer(bprs ~ week + treatment + (1 | subject), data = bprs_l, REML 
 
 # Print the summary of the model
 summary(bprs_l_rim)
-
-
-
-
-# confidence interval --> 1.96 * standard error
-# t value --> test if the value (+/- confidence interval can be 0)
-# the mixed model (lmer) takes into account the correlations between the observations (here between the subjects) --> so it is more accurate --> the standard
-# p-value can be calculated  by inverse function of t value --> a function to invert the t value to the p value!!
 ```
   
+We see in the random intercept model summary that the standard error of the week (the measurement periods) is smaller compared to the standard error in the linear regression model (0.2084 compared to 0.2524) and also the standard error of the treatment 2 is smaller (1.0761 compared to 1.3034). That means that the subject effect was taken into account in this model. The t-value gives a value if the confidence interval of the BPRS values can be 0 - here that is not the case.
+Generally: the mixed model (lmer) takes into account the correlations between the observations (here between the subjects), so it is more accurate compared to the linear regression model. The p-value can be calculated by inverse function of the t-values (a function to invert the t value to the p value).
 
 *** 
 
 ### 4.4. Random Intercept and Random Slope Model
 
+Here we are fitting a random intercept and random slope model to the BPRS values. That allows the linear regression to fit for each subject (patient) to differ in the intercept and in the slope. So it will be possible to take the subject differences into accountof the BPRS values and also in the effect of the measurement period. So in the next model the "week" and the "subject" is included as a  random-effect term.
+  
 ```{r, bprs_lanalysis4, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
-
 # create a random intercept and random slope model
 bprs_l_rim1 <- lmer(bprs ~ week + treatment + (week | subject), data = bprs_l, REML = FALSE)
 
-
-# here the other times (weeks) are included - your get a regression model defined for each subject for each time period (for each week) - so here 9 (0-8 weeks) different regression models 
-# so it inclueds
-
+# here the other times (weeks) are included - you get a regression model defined for each subject for each time period (for each week) - so here 9 (0-8 weeks) different regression models 
 
 # print a summary of the model
 summary(bprs_l_rim1)
+```
+  
+The model results show not so much difference compared to the model before. To check difference in the models we perform an ANOVA.  
 
+```{r, bprs_lanalysis5, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 # perform an ANOVA test on the two models
 anova(bprs_l_rim1, bprs_l_rim)
 ```
+  
+The ANOVA shows that the "Random Intercept and Random Slope Model" (taking week and subject into account) gives a better fit for the data (p-value of 0.02) with a significant outcome.
   
 ***
 
 ### 4.5. Random Intercept and Random Slope Model with interaction
 
-```{r, bprs_lanalysis5, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+Now we perform a "Random Intercept and Random Slope Model" where we include an interaction of the treatment and the time (weeks) to see if the treatment time period interacts with the BRPS value outcome.
+
+```{r, bprs_lanalysis6, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 # create a random intercept and random slope model
 bprs_l_rim2 <- lmer(bprs ~ week * treatment + (week | subject), data = bprs_l, REML = FALSE)
 
@@ -438,7 +462,13 @@ summary(bprs_l_rim2)
 
 # perform an ANOVA test on the two models
 anova(bprs_l_rim2, bprs_l_rim1)
+```
+  
+The ANOVA shows that the "Random Intercept and Random Slope Model" with the time * treatment interaction fits likely better on the data (p-value of 0.075 < 0.1). So there is an interaction of the treatments with the treament time.
+  
+Now, we check the BRPS data again on a graph, then we add fitted BPRS values created by the "Random Intercept and Random Slope Model" with the time * treatment interaction to the data table and draw the plot with the fitted BPRS values.
 
+```{r, bprs_lanalysis7, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 # draw the plot of bprs_l
 ggplot(bprs_l, aes(x = week, y = bprs, linetype = subject)) +
   geom_line(color = "darkgreen") +
@@ -447,15 +477,23 @@ ggplot(bprs_l, aes(x = week, y = bprs, linetype = subject)) +
   scale_x_continuous(name = "Weeks", breaks = seq(0,8,1)) + 
   scale_y_continuous(name = "BPRS values observed", breaks = seq(10,100,5)) + 
   theme(legend.position = "bottom") + 
-  ggtitle("BPRS value overview")
-
+  ggtitle("BPRS: original values by treatment") +
+  theme(legend.box.background = element_rect(),legend.box.margin = margin(2, 2, 2, 2))
+```
+  
+Now we calculate fitted BPRS values according to the latest model and add the fitted BRPS values to the data table. These fitted values are then plotted. The plot shows nicely the BPRS alue development according to the model.  
+  
+```{r, bprs_lanalysis8, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 # Create a vector of the fitted values
 bprs_l_fit <- fitted(bprs_l_rim2)
 
 # Create a new column "fitted_bprs" to bprs_l
-bprs_l$fitted_bprs <- bprs_l_fit
+bprs_l$fitted_bprs <- round(bprs_l_fit, digits = 2)
 
-# draw the plot of fitted bprs values
+# Check the BRPS data table again
+bprs_l %>% knitr::kable() %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") %>% scroll_box(height = "300px")
+
+# Draw the plot of fitted bprs values
 ggplot(bprs_l, aes(x = week, y = fitted_bprs, linetype = subject)) +
   geom_line(color = "darkred") +
   scale_linetype_manual(values = rep(1:6, times = 4)) +
@@ -463,8 +501,8 @@ ggplot(bprs_l, aes(x = week, y = fitted_bprs, linetype = subject)) +
   scale_x_continuous(name = "Weeks", breaks = seq(0,8,1)) + 
   scale_y_continuous(name = "BPRS values modeled", breaks = seq(10,100,5)) + 
   theme(legend.position = "bottom") + 
-  ggtitle("BPRS value overview")
+  ggtitle("BPRS: fitted values by treatment") +
+  theme(legend.box.background = element_rect(),legend.box.margin = margin(2, 2, 2, 2))
 ```
 
-
-
+***
